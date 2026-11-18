@@ -17,6 +17,13 @@ class Camera {
     this.trauma = Math.min(1.0, this.trauma + amount);
   }
 
+  reset() {
+    this.trauma = 0;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.roll = 0;
+  }
+
   update(delta) {
     if (this.trauma > 0) {
       this.trauma = Math.max(0, this.trauma - this.decay * delta);

@@ -290,6 +290,12 @@ class UIManager {
     this.addButton('quests', 660, 325, 360, 56, "KUNLIK VAZIFALAR 🏆", () => { this.game.state = 'QUESTS'; }, '#00f0ff');
     this.addButton('pets', 660, 395, 360, 52, "HAMROHLAR (PETS) 🤖", () => { this.game.state = 'PETS'; }, '#00ffaa');
     this.addButton('settings', 660, 460, 360, 52, "SOZLAMALAR ⚙️", () => { this.game.state = 'SETTINGS'; }, '#00b0ff');
+
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE]", 640, 560);
+    ctx.textAlign = 'left';
   }
 
   drawLevelSelect(ctx) {
@@ -320,7 +326,7 @@ class UIManager {
       const cardY = 180;
       const cardW = 300;
       const cardH = 380;
-      const isUnlocked = unlocked.includes(st.num);
+      const isUnlocked = st.num === 1 || unlocked.map(Number).includes(Number(st.num));
 
       ctx.fillStyle = isUnlocked ? 'rgba(15, 23, 42, 0.92)' : 'rgba(20, 20, 30, 0.6)';
       ctx.fillRect(cardX, cardY, cardW, cardH);
@@ -356,6 +362,11 @@ class UIManager {
       ctx.fillText(starsStr, cardX + cardW / 2, cardY + 230);
 
       if (isUnlocked) {
+        // Entire card is clickable to launch stage
+        this.addButton(`card_stage_${st.num}`, cardX, cardY, cardW, cardH, '', () => {
+          this.game.startStage(st.num);
+        }, 'transparent');
+
         this.addButton(`stage_${st.num}`, cardX + 30, cardY + 290, 240, 50, "BOSHLASH", () => {
           this.game.startStage(st.num);
         }, st.color);
@@ -366,8 +377,13 @@ class UIManager {
       }
     });
 
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("Boshlash: Kartochkani bosing | Klaviatura: [1], [2], [3] yoki [SPACE]", 640, 675);
+
     ctx.textAlign = 'left';
-    this.addButton('ls_back', 520, 600, 240, 48, "ASOSIY MENYU", () => {
+    this.addButton('ls_back', 520, 595, 240, 48, "ASOSIY MENYU", () => {
       this.game.state = 'MENU';
     }, '#00f0ff');
   }
@@ -801,6 +817,8 @@ class UIManager {
 
   renderButtons(ctx) {
     for (const btn of this.buttons) {
+      if (btn.color === 'transparent') continue;
+
       const isHover = this.hoveredBtn === btn;
       ctx.fillStyle = isHover ? 'rgba(0, 240, 255, 0.28)' : 'rgba(15, 23, 42, 0.9)';
       ctx.fillRect(btn.x, btn.y, btn.width, btn.height);

@@ -41,6 +41,17 @@ class CyberBoss {
     this.missiles = [];
   }
 
+  reset() {
+    this.active = false;
+    this.hp = this.maxHp;
+    this.x = 1350;
+    this.y = 360;
+    this.state = 'entering';
+    this.missiles = [];
+    this.attackTimer = 2.8;
+    this.flashTimer = 0;
+  }
+
   takeDamage(amount = 25) {
     if (!this.active || this.state === 'defeated') return;
     

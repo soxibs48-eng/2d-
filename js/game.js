@@ -90,12 +90,38 @@ class Game {
       AudioSys.init();
       AudioSys.resume();
 
-      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
+      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Enter') {
         e.preventDefault();
         if (this.state === 'PLAYING') {
           this.player.jump();
         } else if (this.state === 'MENU') {
           this.state = 'LEVEL_SELECT';
+        } else if (this.state === 'LEVEL_SELECT') {
+          this.startStage(1);
+        } else if (this.state === 'GAMEOVER') {
+          if (this.gameMode === 'campaign') this.startStage(this.currentStage);
+          else this.startEndlessGame();
+        } else if (this.state === 'STAGE_CLEAR') {
+          if (this.currentStage < 3) this.startStage(this.currentStage + 1);
+          else this.state = 'LEVEL_SELECT';
+        } else if (this.state === 'PAUSED') {
+          this.resumeGame();
+        }
+      }
+
+      if (e.code === 'Digit1' || e.code === 'Numpad1') {
+        if (this.state === 'LEVEL_SELECT') this.startStage(1);
+      }
+      if (e.code === 'Digit2' || e.code === 'Numpad2') {
+        if (this.state === 'LEVEL_SELECT') {
+          const unlocked = StorageManager.getUnlockedStages().map(Number);
+          if (unlocked.includes(2)) this.startStage(2);
+        }
+      }
+      if (e.code === 'Digit3' || e.code === 'Numpad3') {
+        if (this.state === 'LEVEL_SELECT') {
+          const unlocked = StorageManager.getUnlockedStages().map(Number);
+          if (unlocked.includes(3)) this.startStage(3);
         }
       }
 
@@ -130,6 +156,8 @@ class Game {
           this.pauseGame();
         } else if (this.state === 'PAUSED') {
           this.resumeGame();
+        } else if (['LEVEL_SELECT', 'SHOP', 'PETS', 'QUESTS', 'SETTINGS'].includes(this.state)) {
+          this.state = 'MENU';
         }
       }
     });
@@ -152,6 +180,7 @@ class Game {
         AudioSys.init();
         if (this.state === 'PLAYING') this.player.jump();
         else if (this.state === 'MENU') this.state = 'LEVEL_SELECT';
+        else if (this.state === 'LEVEL_SELECT') this.startStage(1);
       });
     }
 
@@ -182,27 +211,54 @@ class Game {
       });
     }
 
-    const getCanvasPos = (evt) => {
+    const handleInputPos = (clientX, clientY) => {
+      if (clientX === undefined || clientY === undefined) return;
+      AudioSys.init();
+      AudioSys.resume();
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
       const scaleY = this.canvas.height / rect.height;
-      return {
-        x: (evt.clientX - rect.left) * scaleX,
-        y: (evt.clientY - rect.top) * scaleY
-      };
+      const x = (clientX - rect.left) * scaleX;
+      const y = (clientY - rect.top) * scaleY;
+      this.ui.handleClick(x, y);
     };
 
     this.canvas.addEventListener('click', (e) => {
-      AudioSys.init();
-      AudioSys.resume();
-      const pos = getCanvasPos(e);
-      this.ui.handleClick(pos.x, pos.y);
+      handleInputPos(e.clientX, e.clientY);
     });
 
-    this.canvas.addEventListener('mousemove', (e) => {
-      const pos = getCanvasPos(e);
-      this.ui.handleMouseMove(pos.x, pos.y);
+    this.canvas.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+        handleInputPos(e.clientX, e.clientY);
+      }
     });
+
+    this.canvas.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        handleInputPos(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    this.canvas.addEventListener('mousemove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const scaleX = this.canvas.width / rect.width;
+      const scaleY = this.canvas.height / rect.height;
+      this.ui.handleMouseMove((e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY);
+    });
+  }
+
+  updateTouchControlsVisibility() {
+    const tc = document.getElementById('touch-controls');
+    if (!tc) return;
+    if (this.state === 'PLAYING') {
+      tc.style.display = 'flex';
+      const flipBtn = document.getElementById('touch-flip');
+      if (flipBtn) {
+        flipBtn.style.display = (this.timers.gravity > 0 || this.player.isHyper) ? 'block' : 'none';
+      }
+    } else {
+      tc.style.display = 'none';
+    }
   }
 
   startStage(stageNum) {
@@ -303,6 +359,7 @@ class Game {
   }
 
   update(delta) {
+    this.updateTouchControlsVisibility();
     CameraSys.update(delta);
     ParticleSys.update(delta);
 
