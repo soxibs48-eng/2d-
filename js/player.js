@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: PLAYER CONTROLLER (v2.1 OVERHAUL)
+// PIXEL RUNNER: PLAYER CONTROLLER (v2.2 DOUBLE/TRIPLE JUMP & SLIDE)
 // ==========================================
 
 class Player {
@@ -12,14 +12,20 @@ class Player {
     this.velocityY = 0;
     this.normalGravity = 1400;
     this.jumpForce = 580;
-    this.fastFallAccel = 2400;
+    this.fastFallAccel = 2600;
     
     this.isOnSurface = true;
     this.isInverted = false;
     
+    // Jump mechanics (2-3 times mid-air jump)
+    this.jumpCount = 0;
+    this.maxJumps = 2; // Default: Double Jump! (Can be 3 in Hyper mode)
+    
+    // Slide / Yotish mechanics
     this.isSliding = false;
+    this.slideHeld = false; // Continues while button/key held!
     this.slideTimer = 0;
-    this.slideDuration = 0.6;
+    this.slideMinDuration = 0.45;
     
     this.animTimer = 0;
     this.runFrame = 1;
@@ -29,9 +35,9 @@ class Player {
     this.magnetActive = false;
     this.doubleActive = false;
     this.gravityActive = false;
-    this.isHyper = false; // Fever / Hyper mode!
+    this.isHyper = false;
     
-    // Dash Ability (New Feature)
+    // Dash Ability
     this.isDashing = false;
     this.dashTimer = 0;
     this.dashDuration = 0.22;
@@ -72,7 +78,9 @@ class Player {
     this.y = this.floorY - this.height;
     this.velocityY = 0;
     this.isOnSurface = true;
+    this.jumpCount = 0;
     this.isSliding = false;
+    this.slideHeld = false;
     this.slideTimer = 0;
     this.hasShield = false;
     this.magnetActive = false;
@@ -88,25 +96,50 @@ class Player {
   }
 
   jump() {
+    // Determine maximum allowed jumps (3 in Hyper mode, 2 normally)
+    const allowedJumps = this.isHyper ? 3 : this.maxJumps;
+
     if (this.isOnSurface) {
+      // 1st Jump: From surface
       this.velocityY = this.isInverted ? this.jumpForce : -this.jumpForce;
       this.isOnSurface = false;
       this.isSliding = false;
+      this.jumpCount = 1;
       AudioSys.playSFX('jump');
       
       const footY = this.isInverted ? this.ceilingY : this.floorY;
       ParticleSys.emitJumpBurst(this.x, footY, this.getAccentColor(), this.isInverted);
+    } else if (this.jumpCount < allowedJumps) {
+      // Mid-Air Jump: Double Jump (2-marta sakrash) or Triple Jump!
+      this.jumpCount++;
+      const airForce = this.jumpForce * 0.95;
+      this.velocityY = this.isInverted ? airForce : -airForce;
+      this.isSliding = false;
+      
+      AudioSys.playSFX('jump');
+      
+      const burstColor = this.jumpCount === 2 ? '#00ffff' : '#ff00d4';
+      ParticleSys.emitJumpBurst(this.x, this.y + this.height / 2, burstColor, this.isInverted);
+      
+      const jumpText = this.jumpCount === 2 ? 'DOUBLE JUMP!' : 'TRIPLE JUMP!';
+      ParticleSys.addFloatingText(this.x, this.y - 25, jumpText, burstColor, 15);
     }
   }
 
-  slide() {
+  startSlide() {
+    this.slideHeld = true;
     if (this.isOnSurface) {
       if (!this.isSliding) {
         this.isSliding = true;
-        this.slideTimer = this.slideDuration;
+        this.slideTimer = this.slideMinDuration;
         AudioSys.playSFX('slide');
+        ParticleSys.addFloatingText(this.x, this.y - 15, 'SLIDE!', '#ffaa00', 13);
       }
     }
+  }
+
+  stopSlide() {
+    this.slideHeld = false;
   }
 
   fastFall(delta) {
@@ -124,10 +157,11 @@ class Player {
     AudioSys.playSFX('gravity_flip');
     CameraSys.addTrauma(0.4);
     ParticleSys.addShockwave(this.x, this.y + this.height / 2, '#d844ff');
-    ParticleSys.addFloatingText(this.x, this.y - 20, 'GRAVITY FLIP!', '#d844ff', 14);
+    ParticleSys.addFloatingText(this.x, this.y - 20, 'GRAVITY FLIP!', '#d844ff', 15);
     
-    this.velocityY = this.isInverted ? -350 : 350;
+    this.velocityY = this.isInverted ? -360 : 360;
     this.isOnSurface = false;
+    this.jumpCount = 1; // Can still perform mid-air double jump!
   }
 
   dash() {
@@ -162,7 +196,6 @@ class Player {
     // Dash execution
     if (this.isDashing) {
       this.dashTimer -= delta;
-      // Record afterimages
       this.afterimages.push({
         x: this.x,
         y: this.y,
@@ -175,7 +208,7 @@ class Player {
       }
     }
 
-    // Update afterimages
+    // Afterimages decay
     for (let i = this.afterimages.length - 1; i >= 0; i--) {
       this.afterimages[i].alpha -= delta * 5;
       if (this.afterimages[i].alpha <= 0) {
@@ -183,25 +216,27 @@ class Player {
       }
     }
 
-    // Gravity calculation
+    // Gravity force
     const currentGravity = this.isInverted ? -this.normalGravity : this.normalGravity;
 
     if (!this.isOnSurface && !this.isDashing) {
       this.velocityY += currentGravity * delta;
-      this.velocityY = Math.max(-1200, Math.min(1200, this.velocityY));
+      this.velocityY = Math.max(-1250, Math.min(1250, this.velocityY));
     }
 
     if (!this.isDashing) {
       this.y += this.velocityY * delta;
     }
 
-    // Surface bounds
+    // Surface bounds & collision
+    const currentH = this.isSliding ? 20 : this.height;
+
     if (!this.isInverted) {
-      const currentH = this.isSliding ? 26 : this.height;
       if (this.y + currentH >= this.floorY) {
         this.y = this.floorY - currentH;
         this.velocityY = 0;
         this.isOnSurface = true;
+        this.jumpCount = 0; // Reset jumps upon landing!
       } else {
         this.isOnSurface = false;
       }
@@ -210,27 +245,28 @@ class Player {
         this.y = this.ceilingY;
         this.velocityY = 0;
         this.isOnSurface = true;
+        this.jumpCount = 0; // Reset jumps upon landing on ceiling!
       } else {
         this.isOnSurface = false;
       }
     }
 
-    // Slide timer
+    // Slide duration logic
     if (this.isSliding) {
       this.slideTimer -= delta;
-      if (this.slideTimer <= 0 || !this.isOnSurface) {
+      if ((!this.slideHeld && this.slideTimer <= 0) || !this.isOnSurface) {
         this.isSliding = false;
       }
     }
 
-    // Run particles
+    // Run / Slide trail particles
     if (this.isOnSurface) {
       const trailY = this.isInverted ? this.ceilingY + 4 : this.floorY - 4;
-      const trailColor = this.isHyper ? '#ff00d4' : this.getAccentColor();
-      ParticleSys.emitJetTrail(this.x - 14, trailY, trailColor, this.isSliding ? 3 : 1);
+      const trailColor = this.isHyper ? '#ff00d4' : (this.isSliding ? '#ffaa00' : this.getAccentColor());
+      ParticleSys.emitJetTrail(this.x - 14, trailY, trailColor, this.isSliding ? 4 : 1);
     }
 
-    // Animation frames
+    // Animation cycle
     if (this.isOnSurface && !this.isSliding) {
       this.animTimer += delta * (gameSpeed / 40);
       if (this.animTimer >= 1.0) {
@@ -240,13 +276,14 @@ class Player {
     }
   }
 
+  // Hitbox: height is reduced to 18px when lying down / sliding!
   getHitbox() {
     if (this.isSliding) {
       return {
-        x: this.x - 24,
-        y: this.isInverted ? this.y : this.y + 20,
-        width: 48,
-        height: 26
+        x: this.x - 28,
+        y: this.isInverted ? this.ceilingY : this.floorY - 20,
+        width: 56,
+        height: 20
       };
     }
     return {
@@ -259,16 +296,15 @@ class Player {
 
   takeDamage() {
     if (this.isDashing || this.isHyper) {
-      // Invulnerable during dash and hyper mode!
-      return true;
+      return true; // Invulnerable
     }
 
     if (this.hasShield) {
       this.hasShield = false;
       AudioSys.playSFX('shield_break');
       CameraSys.addTrauma(0.55);
-      ParticleSys.emitExplosion(this.x, this.y + this.height / 2, '#00f0ff', 20);
-      ParticleSys.addFloatingText(this.x, this.y - 20, 'SHIELD BROKE!', '#00f0ff', 14);
+      ParticleSys.emitExplosion(this.x, this.y + this.height / 2, '#00f0ff', 24);
+      ParticleSys.addFloatingText(this.x, this.y - 20, 'SHIELD BROKE!', '#00f0ff', 15);
       return true;
     }
     return false;
@@ -309,16 +345,23 @@ class Player {
 
     const sprite = this.sprites[pose];
     if (sprite && sprite.complete && sprite.naturalWidth > 0) {
-      // Glow filter if in Hyper mode
       if (this.isHyper) {
         ctx.shadowColor = '#ff00ff';
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 18;
       }
-      ctx.drawImage(sprite, -32, -32, 64, 64);
+      // Draw lying horizontal sprite when sliding
+      if (this.isSliding) {
+        ctx.drawImage(sprite, -32, -20, 64, 44);
+      } else {
+        ctx.drawImage(sprite, -32, -32, 64, 64);
+      }
     } else {
+      // Procedural fallback
       ctx.fillStyle = this.getAccentColor();
       if (this.isSliding) {
-        ctx.fillRect(-24, 0, 48, 24);
+        ctx.fillRect(-28, 0, 56, 18);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(10, 4, 10, 6);
       } else {
         ctx.fillRect(-16, -24, 32, 48);
         ctx.fillStyle = '#ffffff';

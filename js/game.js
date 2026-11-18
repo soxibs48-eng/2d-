@@ -92,7 +92,7 @@ class Game {
         e.preventDefault();
         if (this.state === 'PLAYING') {
           if (this.player.isOnSurface) {
-            this.player.slide();
+            this.player.startSlide();
           } else {
             this.player.fastFall(0.05);
           }
@@ -126,6 +126,12 @@ class Game {
       }
     });
 
+    window.addEventListener('keyup', (e) => {
+      if (e.code === 'KeyS' || e.code === 'ArrowDown') {
+        this.player.stopSlide();
+      }
+    });
+
     // Touch controls
     const jumpBtn = document.getElementById('touch-jump');
     const slideBtn = document.getElementById('touch-slide');
@@ -144,7 +150,11 @@ class Game {
     if (slideBtn) {
       slideBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (this.state === 'PLAYING') this.player.slide();
+        if (this.state === 'PLAYING') this.player.startSlide();
+      });
+      slideBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        this.player.stopSlide();
       });
     }
 

@@ -3,12 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Pixel Runner: Anti-Gravity Protocol (v2.1)</title>
+  <title>Pixel Runner: Anti-Gravity Protocol (v2.2)</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- PORTRAIT ROTATION WARNING OVERLAY -->
+  <div id="orientation-warning">
+    <div class="rotate-phone-icon">📱</div>
+    <h2>ILTIMOS, TELEFONINGIZNI GORIZONTAL QILING!</h2>
+    <p>O'yin qulay va to'liq ekranda ishlashi uchun telefoningizni yonbosh (Landscape) holatiga buring.</p>
+  </div>
+
   <div id="game-container">
     <canvas id="gameCanvas" width="1280" height="720"></canvas>
 
@@ -19,8 +26,8 @@
         <button id="touch-flip" class="touch-btn">FLIP GRAVITY</button>
       </div>
       <div id="touch-right">
-        <button id="touch-jump" class="touch-btn">JUMP</button>
-        <button id="touch-slide" class="touch-btn">SLIDE</button>
+        <button id="touch-jump" class="touch-btn">JUMP (2X)</button>
+        <button id="touch-slide" class="touch-btn">SLIDE (YOTISH)</button>
       </div>
     </div>
   </div>

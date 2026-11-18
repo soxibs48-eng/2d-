@@ -5,28 +5,60 @@
       "name": "Floor Spikes",
       "type": "ground",
       "damage": 1,
-      "spawn_weight": 35
+      "spawn_weight": 20
     },
     {
       "id": "spike_ceiling",
       "name": "Ceiling Spikes",
       "type": "ceiling",
       "damage": 1,
-      "spawn_weight": 30
+      "spawn_weight": 18
+    },
+    {
+      "id": "low_beam",
+      "name": "Low Laser Beam",
+      "type": "crouch_required",
+      "damage": 1,
+      "spawn_weight": 16,
+      "description": "Ostidan faqat yotib yoki sirpanib (slide) o'tish lozim bo'lgan pastki lazer to'sig'i."
+    },
+    {
+      "id": "tall_spikes",
+      "name": "Tall Spike Barricade",
+      "type": "double_jump_required",
+      "damage": 1,
+      "spawn_weight": 14,
+      "description": "Ustidan faqat havoda 2-marta sakrab (double jump) o'tish lozim bo'lgan baland tikanlar."
+    },
+    {
+      "id": "patrol_drone",
+      "name": "Cyber Patrol Drone",
+      "type": "horizontal_patrol",
+      "damage": 1,
+      "spawn_weight": 12,
+      "description": "Gorizontal tebranib uchuvchi kiber patrul droni."
+    },
+    {
+      "id": "laser_saw",
+      "name": "Spinning Laser Saw",
+      "type": "rotating_blade",
+      "damage": 1,
+      "spawn_weight": 10,
+      "description": "Tez aylanuvchi lazerli neon arra."
     },
     {
       "id": "laser_barrier",
       "name": "Laser Barrier",
       "type": "vertical",
       "damage": 1,
-      "spawn_weight": 15
+      "spawn_weight": 10
     },
     {
       "id": "floating_mine",
       "name": "Floating Cyber Mine",
       "type": "aerial",
       "damage": 1,
-      "spawn_weight": 12
+      "spawn_weight": 8
     },
     {
       "id": "gravity_portal",

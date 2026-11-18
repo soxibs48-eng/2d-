@@ -4,6 +4,7 @@
   box-sizing: border-box;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 body, html {
@@ -17,6 +18,71 @@ body, html {
   align-items: center;
 }
 
+/* ==========================================
+   PORTRAIT ROTATION WARNING OVERLAY
+   ========================================== */
+#orientation-warning {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(8, 10, 22, 0.96);
+  z-index: 99999;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+  backdrop-filter: blur(8px);
+}
+
+.rotate-phone-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  animation: rotatePhone 2.2s infinite ease-in-out;
+  display: inline-block;
+}
+
+@keyframes rotatePhone {
+  0%, 15% {
+    transform: rotate(0deg);
+  }
+  50%, 75% {
+    transform: rotate(-90deg) scale(1.15);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+#orientation-warning h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  color: #00f0ff;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+#orientation-warning p {
+  color: #abbccd;
+  font-size: 16px;
+  max-width: 320px;
+  line-height: 1.4;
+}
+
+/* Show warning ONLY when device is held in portrait */
+@media (orientation: portrait) and (max-width: 1024px) {
+  #orientation-warning {
+    display: flex;
+  }
+}
+
+/* ==========================================
+   GAME CONTAINER & CANVAS
+   ========================================== */
 #game-container {
   position: relative;
   width: 100vw;
@@ -26,7 +92,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 50px rgba(0, 240, 255, 0.15);
+  box-shadow: 0 0 60px rgba(0, 240, 255, 0.18);
 }
 
 #gameCanvas {
@@ -40,7 +106,9 @@ body, html {
   background-color: #0b0c16;
 }
 
-/* TOUCH CONTROLS */
+/* ==========================================
+   TOUCH CONTROLS (Mobile / Tablet)
+   ========================================== */
 #touch-controls {
   position: absolute;
   top: 0;
@@ -51,59 +119,68 @@ body, html {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding: 24px;
+  padding: 20px;
 }
 
 #touch-left, #touch-right {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   pointer-events: auto;
 }
 
 .touch-btn {
-  background: rgba(12, 18, 35, 0.75);
+  background: rgba(12, 18, 35, 0.8);
   border: 2px solid #00f0ff;
-  border-radius: 8px;
+  border-radius: 10px;
   color: #fff;
   font-family: 'Press Start 2P', monospace;
-  font-size: 14px;
-  padding: 16px 24px;
+  font-size: 12px;
+  padding: 16px 22px;
   cursor: pointer;
   text-shadow: 0 0 8px #00f0ff;
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-  transition: all 0.1s ease;
-  backdrop-filter: blur(4px);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+  transition: all 0.08s ease;
+  backdrop-filter: blur(5px);
+  touch-action: manipulation;
 }
 
 .touch-btn:active {
-  background: rgba(0, 240, 255, 0.4);
-  transform: scale(0.95);
+  background: rgba(0, 240, 255, 0.45);
+  transform: scale(0.92);
 }
 
 #touch-jump {
   border-color: #00ffcc;
   color: #00ffcc;
-  font-size: 16px;
-  padding: 20px 32px;
+  font-size: 14px;
+  padding: 20px 28px;
 }
 
 #touch-slide {
   border-color: #ffaa00;
   color: #ffaa00;
-  font-size: 16px;
-  padding: 18px 30px;
+  font-size: 13px;
+  padding: 18px 24px;
+}
+
+#touch-dash {
+  border-color: #00e5ff;
+  color: #00e5ff;
+  font-size: 12px;
+  padding: 14px 20px;
 }
 
 #touch-flip {
   border-color: #d844ff;
   color: #d844ff;
-  font-size: 14px;
-  display: none; /* Only visible when Gravity Core active */
+  font-size: 12px;
+  padding: 14px 20px;
+  display: none;
 }
 
-/* Hide touch buttons on desktop unless touch detected or small screen */
-@media (hover: hover) and (min-width: 900px) {
+/* Auto-hide touch controls on desktop mouse screens */
+@media (hover: hover) and (min-width: 1024px) {
   #touch-controls {
     display: none;
   }

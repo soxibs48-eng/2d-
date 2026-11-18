@@ -163,7 +163,7 @@ class UIManager {
     // Controls hints on bottom
     ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.font = '13px "Rajdhani", sans-serif';
-    ctx.fillText('SPACE/W: Sakrash  |  S: Egilish/Tez tushish  |  E: Cyber Dash  |  SHIFT/F: Antigravitatsiya  |  ESC: Pauza', 30, 705);
+    ctx.fillText('SPACE/W: 2x Sakrash (Double Jump)  |  S (Ushlab turish): Yotish/Sirpanish  |  E: Cyber Dash  |  SHIFT/F: Flip', 30, 705);
   }
 
   drawBadge(ctx, x, y, icon, label, color) {
