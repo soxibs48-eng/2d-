@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: MAIN GAME ENGINE (v2.1 OVERHAUL)
+// PIXEL RUNNER: MAIN GAME ENGINE (v2.3 STAGED CAMPAIGN)
 // ==========================================
 
 class Game {
@@ -19,18 +19,24 @@ class Game {
     this.coins = 0;
     this.isNewRecord = false;
 
-    // New Mechanics: Combo & Fever
+    // Game Mode & Stage Progression (New Feature)
+    this.gameMode = 'campaign'; // 'campaign' or 'endless'
+    this.currentStage = 1;
+    this.stageBonus = 0;
+
+    // Mechanics: Combo & Fever
     this.comboMultiplier = 1.0;
     this.maxCombo = 1.0;
     this.feverMeter = 0;
     this.hyperTimer = 0;
 
-    // Game state: MENU, PLAYING, PAUSED, GAMEOVER, SHOP, SETTINGS
+    // Game state: MENU, LEVEL_SELECT, PLAYING, PAUSED, STAGE_CLEAR, GAMEOVER, SHOP, SETTINGS
     this.state = 'MENU';
 
     // Entities
     this.player = new Player();
     this.spawner = new Spawner();
+    this.boss = new CyberBoss(this);
     this.ui = new UIManager(this);
     this.obstacles = [];
     this.pickups = [];
@@ -56,6 +62,12 @@ class Game {
     
     this.lastTime = performance.now();
     requestAnimationFrame((t) => this.loop(t));
+  }
+
+  getStageTarget(stageNum) {
+    if (stageNum === 1) return 400;
+    if (stageNum === 2) return 600;
+    return 800; // Stage 3 target before / during boss
   }
 
   loadBackgrounds() {
@@ -84,7 +96,7 @@ class Game {
         if (this.state === 'PLAYING') {
           this.player.jump();
         } else if (this.state === 'MENU') {
-          this.startGame();
+          this.state = 'LEVEL_SELECT';
         }
       }
 
@@ -99,7 +111,6 @@ class Game {
         }
       }
 
-      // Dash Ability (Key E)
       if (e.code === 'KeyE') {
         e.preventDefault();
         if (this.state === 'PLAYING') {
@@ -107,7 +118,6 @@ class Game {
         }
       }
 
-      // Flip Gravity (Shift or F)
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyF') {
         e.preventDefault();
         if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.player.isHyper)) {
@@ -143,7 +153,7 @@ class Game {
         e.preventDefault();
         AudioSys.init();
         if (this.state === 'PLAYING') this.player.jump();
-        else if (this.state === 'MENU') this.startGame();
+        else if (this.state === 'MENU') this.state = 'LEVEL_SELECT';
       });
     }
 
@@ -175,7 +185,6 @@ class Game {
       });
     }
 
-    // Canvas click & mouse position
     const getCanvasPos = (evt) => {
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
@@ -199,7 +208,31 @@ class Game {
     });
   }
 
-  startGame() {
+  startStage(stageNum) {
+    this.gameMode = 'campaign';
+    this.currentStage = stageNum;
+    this.startCommonGame();
+
+    ParticleSys.addFloatingText(640, 240, `${stageNum}-BOSQICH BOSHLANDI!`, '#00f0ff', 24);
+
+    if (stageNum === 3) {
+      // Climax Boss Stage: Boss activates after short buildup
+      setTimeout(() => {
+        if (this.state === 'PLAYING' && this.currentStage === 3) {
+          this.boss.activate();
+        }
+      }, 3500);
+    }
+  }
+
+  startEndlessGame() {
+    this.gameMode = 'endless';
+    this.currentStage = 1;
+    this.startCommonGame();
+    ParticleSys.addFloatingText(640, 240, 'CHEKSIZ REJIM BOSHLANDI!', '#ffaa00', 22);
+  }
+
+  startCommonGame() {
     this.state = 'PLAYING';
     this.distance = 0;
     this.coins = 0;
@@ -217,6 +250,7 @@ class Game {
 
     this.obstacles = [];
     this.pickups = [];
+    this.boss.deactivate();
     this.player.reset();
     this.spawner.reset();
     ParticleSys.reset();
@@ -225,6 +259,20 @@ class Game {
 
     const flipBtn = document.getElementById('touch-flip');
     if (flipBtn) flipBtn.style.display = 'none';
+  }
+
+  completeCurrentStage() {
+    this.state = 'STAGE_CLEAR';
+    AudioSys.playSFX('powerup');
+    CameraSys.addTrauma(0.5);
+
+    this.stageBonus = this.currentStage * 35;
+    StorageManager.addCoins(this.coins + this.stageBonus);
+    StorageManager.saveStageStars(this.currentStage, 3);
+    StorageManager.unlockStage(this.currentStage + 1);
+
+    ParticleSys.addShockwave(640, 360, '#00ffcc');
+    ParticleSys.addFloatingText(640, 280, '★ STAGE COMPLETE! ★', '#00ffcc', 28);
   }
 
   pauseGame() {
@@ -261,7 +309,6 @@ class Game {
     CameraSys.update(delta);
     ParticleSys.update(delta);
 
-    // Parallax background scrolling
     const scrollSpeed = this.state === 'PLAYING' ? this.gameSpeed : 80;
     this.bgOffsets.sky = (this.bgOffsets.sky + scrollSpeed * 0.1 * delta) % 1280;
     this.bgOffsets.far = (this.bgOffsets.far + scrollSpeed * 0.3 * delta) % 1280;
@@ -271,11 +318,19 @@ class Game {
 
     if (this.state !== 'PLAYING') return;
 
-    // Progress distance
     this.distance += (this.gameSpeed * delta) / 10;
 
-    // Combo multiplier slowly ramps up during clean run
-    this.comboMultiplier = Math.min(4.0, 1.0 + (this.distance / 250) * 0.2);
+    // Stage 1 & 2 Completion Check
+    if (this.gameMode === 'campaign') {
+      const target = this.getStageTarget(this.currentStage);
+      if (this.currentStage < 3 && this.distance >= target) {
+        this.completeCurrentStage();
+        return;
+      }
+    }
+
+    // Combo multiplier
+    this.comboMultiplier = Math.min(4.0, 1.0 + (this.distance / 220) * 0.2);
     this.maxCombo = Math.max(this.maxCombo, this.comboMultiplier);
 
     // Hyper mode timer
@@ -286,11 +341,9 @@ class Game {
         this.feverMeter = 0;
       }
     } else {
-      // Natural slow decay of fever
       this.feverMeter = Math.max(0, this.feverMeter - delta * 1.5);
     }
 
-    // Dynamic speed formula
     this.gameSpeed = Math.min(this.baseSpeed + this.distance * this.accelerationRate, this.maxSpeed);
 
     // Power-up timers
@@ -314,11 +367,14 @@ class Game {
       this.player.doubleActive = this.timers.double > 0;
     }
 
-    // Player update
+    // Update Player & Spawner with stage context
     this.player.update(delta, this.gameSpeed);
+    this.spawner.update(delta, this.gameSpeed, this.obstacles, this.pickups, this.currentStage, this.boss.active);
 
-    // Spawner update
-    this.spawner.update(delta, this.gameSpeed, this.obstacles, this.pickups);
+    // Update Boss if active
+    if (this.boss.active) {
+      this.boss.update(delta, this.player);
+    }
 
     // Obstacles collision
     const pHitbox = this.player.getHitbox();
@@ -344,7 +400,6 @@ class Game {
           this.feverMeter = Math.min(100, this.feverMeter + 10);
           this.obstacles.splice(i, 1);
         } else if (this.player.isHyper || this.player.isDashing) {
-          // Smash obstacle during hyper or dash!
           ParticleSys.emitExplosion(obs.x, obs.y, '#ff00aa', 16);
           ParticleSys.addFloatingText(obs.x, obs.y, '+50 SMASH!', '#ff00aa', 16);
           this.coins += 2;
@@ -353,7 +408,7 @@ class Game {
         } else if (obs.damage) {
           const survived = this.player.takeDamage();
           if (survived) {
-            this.comboMultiplier = 1.0; // Combo reset on hit
+            this.comboMultiplier = 1.0;
             this.obstacles.splice(i, 1);
           } else {
             this.endGame();
@@ -387,6 +442,14 @@ class Game {
           AudioSys.playSFX('coin');
           ParticleSys.emitCoinSparkle(p.x, p.y);
           ParticleSys.addFloatingText(p.x, p.y - 10, `+${gained}`, '#ffd700', 14);
+        } else if (p.type === 'emp_orb') {
+          // EMP Orb collected: deals damage to the boss!
+          AudioSys.playSFX('powerup');
+          ParticleSys.addShockwave(p.x, p.y, '#00ff66');
+          ParticleSys.addFloatingText(p.x, p.y - 20, 'EMP LAUNCHED!', '#00ff66', 16);
+          if (this.boss.active) {
+            this.boss.takeDamage(25);
+          }
         } else if (p.type === 'shield') {
           this.player.hasShield = true;
           AudioSys.playSFX('powerup');
@@ -419,7 +482,6 @@ class Game {
     this.ctx.save();
     CameraSys.apply(this.ctx);
 
-    // Dynamic Biome tinting
     this.drawParallax();
 
     for (const obs of this.obstacles) {
@@ -429,33 +491,31 @@ class Game {
       p.draw(this.ctx);
     }
 
-    if (this.state === 'PLAYING' || this.state === 'PAUSED') {
+    if (this.boss.active) {
+      this.boss.draw(this.ctx);
+    }
+
+    if (this.state === 'PLAYING' || this.state === 'PAUSED' || this.state === 'STAGE_CLEAR') {
       this.player.draw(this.ctx);
     }
 
-    // Draw Particles on top of world
     ParticleSys.draw(this.ctx);
 
     this.ctx.restore();
 
-    // Draw UI Overlays
     this.ui.draw(this.ctx);
   }
 
   drawParallax() {
     const { ctx } = this;
 
-    // Apply Biome hue based on distance
     ctx.save();
-    if (this.distance > 1200) {
-      // Emerald Cyber Core
-      ctx.filter = 'hue-rotate(90deg) saturate(1.2)';
-    } else if (this.distance > 500) {
-      // Synthwave Sunset
-      ctx.filter = 'hue-rotate(280deg) saturate(1.3)';
+    if (this.currentStage === 3 || this.distance > 1200) {
+      ctx.filter = 'hue-rotate(90deg) saturate(1.25)';
+    } else if (this.currentStage === 2 || this.distance > 500) {
+      ctx.filter = 'hue-rotate(280deg) saturate(1.35)';
     }
 
-    // Sky
     if (this.bgImages.sky.complete && this.bgImages.sky.naturalWidth > 0) {
       const offX = -this.bgOffsets.sky;
       ctx.drawImage(this.bgImages.sky, offX, 0, 1280, 720);
@@ -465,23 +525,20 @@ class Game {
       ctx.fillRect(0, 0, 1280, 720);
     }
 
-    // Far Buildings
     if (this.bgImages.far.complete && this.bgImages.far.naturalWidth > 0) {
       const offX = -this.bgOffsets.far;
       ctx.drawImage(this.bgImages.far, offX, 0, 1280, 720);
       ctx.drawImage(this.bgImages.far, offX + 1280, 0, 1280, 720);
     }
 
-    // Mid Buildings
     if (this.bgImages.mid.complete && this.bgImages.mid.naturalWidth > 0) {
       const offX = -this.bgOffsets.mid;
       ctx.drawImage(this.bgImages.mid, offX, 0, 1280, 720);
       ctx.drawImage(this.bgImages.mid, offX + 1280, 0, 1280, 720);
     }
 
-    ctx.restore(); // Restore filter
+    ctx.restore();
 
-    // Ceiling Track
     const ceilOffX = -this.bgOffsets.ceiling;
     for (let x = ceilOffX - 256; x < 1280 + 256; x += 256) {
       if (this.bgImages.ceiling.complete && this.bgImages.ceiling.naturalWidth > 0) {
@@ -492,7 +549,6 @@ class Game {
       }
     }
 
-    // Floor Track
     const floorOffX = -this.bgOffsets.floor;
     for (let x = floorOffX - 256; x < 1280 + 256; x += 256) {
       if (this.bgImages.floor.complete && this.bgImages.floor.naturalWidth > 0) {

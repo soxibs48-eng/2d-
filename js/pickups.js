@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: PICKUPS & COLLECTIBLES
+// PIXEL RUNNER: PICKUPS & COLLECTIBLES (v2.3)
 // ==========================================
 
 class Pickup {
@@ -13,7 +13,7 @@ class Pickup {
     this.radius = 18;
 
     this.sprite = new Image();
-    const spriteName = type === 'coin' ? 'coin' : `powerup_${type}`;
+    const spriteName = type === 'coin' ? 'coin' : (type === 'emp_orb' ? 'powerup_shield' : `powerup_${type}`);
     this.sprite.src = `assets/sprites/pickups/${spriteName}.png`;
   }
 
@@ -21,17 +21,16 @@ class Pickup {
     this.x -= gameSpeed * delta;
     this.time += delta * 4;
 
-    // Bobbing animation
     this.y = this.initialY + Math.sin(this.time) * 6;
 
     // Magnet attraction
-    if (this.type === 'coin' && player.magnetActive) {
+    if ((this.type === 'coin' || this.type === 'emp_orb') && player.magnetActive) {
       const dx = player.x - this.x;
       const dy = player.y - this.y;
       const dist = Math.hypot(dx, dy);
 
       if (dist < player.magnetRadius) {
-        const pullSpeed = 800 * delta;
+        const pullSpeed = 820 * delta;
         this.x += (dx / dist) * pullSpeed;
         this.y += (dy / dist) * pullSpeed;
       }
@@ -54,7 +53,27 @@ class Pickup {
     ctx.save();
     ctx.translate(this.x, this.y);
 
-    if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
+    if (this.type === 'emp_orb') {
+      // Custom glowing EMP Orb that damages the Boss
+      ctx.fillStyle = '#00ff66';
+      ctx.shadowColor = '#00ff66';
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.arc(0, 0, 16, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      // EMP lightning rings
+      ctx.strokeStyle = '#00ffcc';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 20 + Math.sin(this.time * 5) * 4, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
       if (this.type === 'coin') {
         const scaleX = Math.cos(this.time * 0.8);
         ctx.scale(scaleX, 1);
@@ -65,7 +84,6 @@ class Pickup {
         ctx.drawImage(this.sprite, -22, -22, 44, 44);
       }
     } else {
-      // Procedural fallback
       ctx.fillStyle = this.type === 'coin' ? '#ffd700' : '#00ffff';
       ctx.beginPath();
       ctx.arc(0, 0, this.radius, 0, Math.PI * 2);

@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: LOCAL STORAGE MANAGER
+// PIXEL RUNNER: LOCAL STORAGE MANAGER (v2.3)
 // ==========================================
 
 const StorageManager = {
@@ -33,6 +33,33 @@ const StorageManager = {
       return true;
     }
     return false;
+  },
+
+  // STAGE PROGRESSION
+  getUnlockedStages() {
+    const s = localStorage.getItem('pixel_runner_unlocked_stages');
+    return s ? JSON.parse(s) : [1];
+  },
+
+  unlockStage(stageNum) {
+    const stages = this.getUnlockedStages();
+    if (!stages.includes(stageNum)) {
+      stages.push(stageNum);
+      localStorage.setItem('pixel_runner_unlocked_stages', JSON.stringify(stages));
+    }
+  },
+
+  getStageStars() {
+    const s = localStorage.getItem('pixel_runner_stage_stars');
+    return s ? JSON.parse(s) : { 1: 0, 2: 0, 3: 0 };
+  },
+
+  saveStageStars(stageNum, stars) {
+    const data = this.getStageStars();
+    if ((data[stageNum] || 0) < stars) {
+      data[stageNum] = stars;
+      localStorage.setItem('pixel_runner_stage_stars', JSON.stringify(data));
+    }
   },
 
   getUnlockedSkins() {

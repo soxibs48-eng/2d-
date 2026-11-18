@@ -1,0 +1,33 @@
+{
+  "stages": [
+    {
+      "id": 1,
+      "name": "NEON CITY",
+      "target_distance": 400,
+      "theme": "cyber_blue",
+      "coin_bonus": 35,
+      "description": "Kirish bosqichi: Sakrash, 2-marta sakrash va pastki lazerlar ostidan yotib o'tish."
+    },
+    {
+      "id": 2,
+      "name": "GRAVITY ANOMALY",
+      "target_distance": 600,
+      "theme": "synthwave_purple",
+      "coin_bonus": 70,
+      "description": "Murakkab gravitatsiya anomaliyasi: Shiftda yugurish, aylanuvchi lazer arralar va portal labirinti."
+    },
+    {
+      "id": 3,
+      "name": "CYBER MATRIX & BOSS",
+      "target_distance": 800,
+      "theme": "matrix_green",
+      "coin_bonus": 105,
+      "boss": {
+        "name": "Cyber Goliath",
+        "hp": 100,
+        "attacks": ["plasma_torpedo", "laser_beam", "ceiling_rocket"]
+      },
+      "description": "Hal qiluvchi bosqich: Kiber dushmanlar va Cyber Goliath bossi bilan jang!"
+    }
+  ]
+}

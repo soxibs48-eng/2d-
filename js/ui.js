@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: CANVAS UI SYSTEM (v2.1 OVERHAUL)
+// PIXEL RUNNER: CANVAS UI SYSTEM (v2.3 STAGE CAMPAIGN)
 // ==========================================
 
 class UIManager {
@@ -69,12 +69,19 @@ class UIManager {
       case 'MENU':
         this.drawMainMenu(ctx);
         break;
+      case 'LEVEL_SELECT':
+        this.drawLevelSelect(ctx);
+        break;
       case 'PLAYING':
         this.drawHUD(ctx);
         break;
       case 'PAUSED':
         this.drawHUD(ctx);
         this.drawPauseMenu(ctx);
+        break;
+      case 'STAGE_CLEAR':
+        this.drawHUD(ctx);
+        this.drawStageClear(ctx);
         break;
       case 'GAMEOVER':
         this.drawHUD(ctx);
@@ -93,52 +100,61 @@ class UIManager {
 
   drawHUD(ctx) {
     // 1. Top Glassmorphism Bar
-    ctx.fillStyle = 'rgba(10, 15, 30, 0.82)';
+    ctx.fillStyle = 'rgba(10, 15, 30, 0.85)';
     ctx.fillRect(0, 0, 1280, 68);
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(0, 67, 1280, 1);
 
-    // Distance
+    // Distance or Stage Progress
     ctx.fillStyle = '#00f0ff';
-    ctx.font = '16px "Press Start 2P", monospace';
-    ctx.fillText(`MASOFA: ${Math.floor(this.game.distance)}m`, 30, 42);
+    ctx.font = '14px "Press Start 2P", monospace';
+    if (this.game.gameMode === 'campaign') {
+      const target = this.game.getStageTarget(this.game.currentStage);
+      const displayDist = Math.min(target, Math.floor(this.game.distance));
+      ctx.fillText(`${this.game.currentStage}-BOSQICH: ${displayDist}/${target}m`, 30, 42);
+    } else {
+      ctx.fillText(`MASOFA: ${Math.floor(this.game.distance)}m`, 30, 42);
+    }
 
     // Coins
     if (this.coinIcon.complete) {
-      ctx.drawImage(this.coinIcon, 340, 22, 24, 24);
+      ctx.drawImage(this.coinIcon, 390, 22, 24, 24);
     }
     ctx.fillStyle = '#ffd700';
     ctx.font = '16px "Press Start 2P", monospace';
-    ctx.fillText(`${this.game.coins}`, 375, 42);
+    ctx.fillText(`${this.game.coins}`, 425, 42);
 
-    // Speedometer (New Feature)
+    // Speedometer
     const speedKmh = Math.floor(this.game.gameSpeed);
     ctx.fillStyle = '#ff00aa';
-    ctx.font = '13px "Press Start 2P", monospace';
-    ctx.fillText(`TEZLIK: ${speedKmh} KM/H`, 470, 42);
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText(`${speedKmh} KM/H`, 520, 42);
 
-    // Combo Meter (New Feature)
+    // Combo Meter
     ctx.fillStyle = '#00ffcc';
-    ctx.font = '13px "Press Start 2P", monospace';
-    ctx.fillText(`KOMBO: x${this.game.comboMultiplier.toFixed(1)}`, 740, 42);
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText(`KOMBO x${this.game.comboMultiplier.toFixed(1)}`, 680, 42);
 
-    // Dash Status (New Feature)
+    // Dash Status
     const dashReady = this.game.player.dashCooldown <= 0;
     ctx.fillStyle = dashReady ? '#00ffff' : '#778899';
     ctx.font = '11px "Press Start 2P", monospace';
-    const dashText = dashReady ? 'DASH: TAYYOR (E)' : `DASH: ${this.game.player.dashCooldown.toFixed(1)}s`;
-    ctx.fillText(dashText, 930, 42);
+    const dashText = dashReady ? 'DASH (E): TAYYOR' : `DASH: ${this.game.player.dashCooldown.toFixed(1)}s`;
+    ctx.fillText(dashText, 880, 42);
 
-    // Pause button in HUD
+    // Pause button
     this.addButton('pause', 1210, 14, 40, 40, 'II', () => this.game.pauseGame(), '#00f0ff');
 
-    // 2. Fever / Hyper Gauge (Top Center Line)
-    const feverPct = Math.min(1.0, this.game.feverMeter / 100.0);
-    ctx.fillStyle = 'rgba(255, 0, 128, 0.2)';
-    ctx.fillRect(0, 68, 1280, 4);
-    ctx.fillStyle = this.game.player.isHyper ? '#00ffff' : '#ff0088';
-    ctx.fillRect(0, 68, 1280 * feverPct, 4);
+    // 2. Stage Progress Line (Top line)
+    if (this.game.gameMode === 'campaign') {
+      const target = this.game.getStageTarget(this.game.currentStage);
+      const prog = Math.min(1.0, this.game.distance / target);
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.2)';
+      ctx.fillRect(0, 68, 1280, 4);
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillRect(0, 68, 1280 * prog, 4);
+    }
 
     // 3. Power-up Badges (Left Column)
     let badgeX = 30;
@@ -182,33 +198,162 @@ class UIManager {
   }
 
   drawMainMenu(ctx) {
-    ctx.fillStyle = 'rgba(8, 10, 20, 0.75)';
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.78)';
     ctx.fillRect(0, 0, 1280, 720);
 
-    // Glowing Title
     ctx.fillStyle = '#00f0ff';
-    ctx.font = '52px "Press Start 2P", monospace';
+    ctx.font = '50px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
     ctx.shadowColor = '#00f0ff';
-    ctx.shadowBlur = 25;
-    ctx.fillText('PIXEL RUNNER', 640, 210);
+    ctx.shadowBlur = 24;
+    ctx.fillText('PIXEL RUNNER', 640, 190);
     ctx.shadowBlur = 0;
 
-    // Subtitle
     ctx.fillStyle = '#ff2288';
     ctx.font = '18px "Press Start 2P", monospace';
-    ctx.fillText('— ANTI-GRAVITY PROTOCOL —', 640, 258);
+    ctx.fillText('— ANTI-GRAVITY PROTOCOL —', 640, 240);
 
-    // High score banner
     ctx.fillStyle = '#8899aa';
     ctx.font = '13px "Press Start 2P", monospace';
-    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 310);
+    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 290);
     ctx.textAlign = 'left';
 
-    // Buttons
-    this.addButton('play', 480, 360, 320, 56, "O'YINNI BOSHLASH", () => this.game.startGame(), '#00ffcc');
-    this.addButton('shop', 480, 435, 320, 52, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
-    this.addButton('settings', 480, 505, 320, 52, "SOZLAMALAR", () => { this.game.state = 'SETTINGS'; }, '#00f0ff');
+    // Buttons: Campaign Mode vs Endless Mode
+    this.addButton('campaign', 460, 335, 360, 56, "BOSQICHLI REJIM (1-3)", () => { this.game.state = 'LEVEL_SELECT'; }, '#00ffcc');
+    this.addButton('endless', 460, 405, 360, 52, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
+    this.addButton('shop', 460, 470, 360, 50, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
+    this.addButton('settings', 460, 530, 360, 50, "SOZLAMALAR", () => { this.game.state = 'SETTINGS'; }, '#00f0ff');
+  }
+
+  drawLevelSelect(ctx) {
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.95)';
+    ctx.fillRect(0, 0, 1280, 720);
+
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '28px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("BOSQICHLAR XARITASI (LEVEL SELECT)", 640, 80);
+
+    ctx.fillStyle = '#8899aa';
+    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.fillText("Har bir bosqichni muvaffaqiyatli yakunlab, keyingisini oching!", 640, 120);
+    ctx.textAlign = 'left';
+
+    const unlocked = StorageManager.getUnlockedStages();
+    const starsData = StorageManager.getStageStars();
+
+    const stages = [
+      { num: 1, name: 'NEON CITY', dist: '400m', desc: 'Kirish: Sakrash va yotib sirpanish', color: '#00f0ff' },
+      { num: 2, name: 'GRAVITY ANOMALY', dist: '600m', desc: 'Shiftda yugurish va lazer arralar', color: '#d844ff' },
+      { num: 3, name: 'CYBER MATRIX & BOSS', dist: 'BOSS', desc: 'Kiber Goliath dushmani jangi!', color: '#ff2255' }
+    ];
+
+    stages.forEach((stg, idx) => {
+      const cardX = 140 + idx * 350;
+      const cardY = 160;
+      const isUnlocked = unlocked.includes(stg.num);
+      const stars = starsData[stg.num] || 0;
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(cardX, cardY, 300, 380);
+      ctx.strokeStyle = isUnlocked ? stg.color : '#334455';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(cardX, cardY, 300, 380);
+
+      // Stage Header
+      ctx.fillStyle = isUnlocked ? stg.color : '#556677';
+      ctx.font = '16px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${stg.num}-BOSQICH`, cardX + 150, cardY + 45);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText(stg.name, cardX + 150, cardY + 80);
+
+      // Stars display
+      let starStr = '☆☆☆';
+      if (stars === 1) starStr = '★☆☆';
+      else if (stars === 2) starStr = '★★☆';
+      else if (stars === 3) starStr = '★★★';
+      ctx.fillStyle = '#ffd700';
+      ctx.font = '22px "Press Start 2P", monospace';
+      ctx.fillText(isUnlocked ? starStr : '🔒', cardX + 150, cardY + 130);
+
+      // Target distance
+      ctx.fillStyle = '#00ffcc';
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.fillText(`Masofa: ${stg.dist}`, cardX + 150, cardY + 180);
+
+      ctx.fillStyle = '#8899aa';
+      ctx.font = '13px "Rajdhani", sans-serif';
+      ctx.fillText(stg.desc, cardX + 150, cardY + 230);
+      ctx.textAlign = 'left';
+
+      // Play Button
+      if (isUnlocked) {
+        this.addButton(`stage_${stg.num}`, cardX + 40, cardY + 280, 220, 50, "O'YNASH", () => {
+          this.game.startStage(stg.num);
+        }, stg.color);
+      } else {
+        ctx.fillStyle = '#445566';
+        ctx.fillRect(cardX + 40, cardY + 280, 220, 50);
+        ctx.fillStyle = '#8899aa';
+        ctx.font = '12px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('QULFLANGAN', cardX + 150, cardY + 310);
+        ctx.textAlign = 'left';
+      }
+    });
+
+    this.addButton('level_back', 540, 580, 200, 46, 'ORTGA', () => { this.game.state = 'MENU'; }, '#00f0ff');
+  }
+
+  drawStageClear(ctx) {
+    ctx.fillStyle = 'rgba(8, 20, 16, 0.9)';
+    ctx.fillRect(0, 0, 1280, 720);
+
+    ctx.fillStyle = '#0c1a18';
+    ctx.fillRect(400, 120, 480, 460);
+    ctx.strokeStyle = '#00ffcc';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(400, 120, 480, 460);
+
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = '26px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("BOSQICH YAKUNLANDI!", 640, 185);
+
+    // Stars
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '32px "Press Start 2P", monospace';
+    ctx.fillText('★★★', 640, 240);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.fillText(`${this.game.currentStage}-BOSQICH TO'LIQ BOSIB O'TILDI!`, 640, 290);
+
+    ctx.fillStyle = '#ffd700';
+    ctx.fillText(`Mukofot: +${this.game.stageBonus} Tangalar!`, 640, 335);
+
+    ctx.fillStyle = '#8899aa';
+    ctx.fillText(`Jami tangalar: ${StorageManager.getTotalCoins()}`, 640, 375);
+    ctx.textAlign = 'left';
+
+    if (this.game.currentStage < 3) {
+      this.addButton('next_stage', 460, 415, 360, 52, "KEYINGI BOSQICH", () => {
+        this.game.startStage(this.game.currentStage + 1);
+      }, '#00ffcc');
+    } else {
+      ctx.fillStyle = '#ffd700';
+      ctx.font = '16px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText("TABRIKLAYMIZ! O'YIN TO'LIQ YUTILD!", 640, 430);
+      ctx.textAlign = 'left';
+    }
+
+    this.addButton('stage_menu', 460, 480, 360, 46, "BOSQICHLAR XARITASI", () => {
+      this.game.state = 'LEVEL_SELECT';
+    }, '#00f0ff');
   }
 
   drawPauseMenu(ctx) {
@@ -228,7 +373,10 @@ class UIManager {
     ctx.textAlign = 'left';
 
     this.addButton('resume', 510, 270, 260, 48, 'DAVOM ETTIRISH', () => this.game.resumeGame(), '#00ffcc');
-    this.addButton('restart', 510, 335, 260, 48, 'QAYTA BOSHLASH', () => this.game.startGame(), '#ffd700');
+    this.addButton('restart', 510, 335, 260, 48, 'QAYTA BOSHLASH', () => {
+      if (this.game.gameMode === 'campaign') this.game.startStage(this.game.currentStage);
+      else this.game.startEndlessGame();
+    }, '#ffd700');
     this.addButton('menu', 510, 400, 260, 48, 'ASOSIY MENYU', () => { this.game.state = 'MENU'; }, '#ff4444');
   }
 
@@ -264,7 +412,10 @@ class UIManager {
     ctx.fillText(`Eng yaxshi: ${Math.floor(StorageManager.getHighScore())} m`, 640, 365);
     ctx.textAlign = 'left';
 
-    this.addButton('go_restart', 480, 400, 320, 50, 'QAYTA BOSHLASH', () => this.game.startGame(), '#00ffcc');
+    this.addButton('go_restart', 480, 400, 320, 50, 'QAYTA BOSHLASH', () => {
+      if (this.game.gameMode === 'campaign') this.game.startStage(this.game.currentStage);
+      else this.game.startEndlessGame();
+    }, '#00ffcc');
     this.addButton('go_shop', 480, 460, 320, 46, "DO'KON (SKINLAR)", () => { this.game.state = 'SHOP'; }, '#ffd700');
     this.addButton('go_menu', 480, 515, 320, 46, 'ASOSIY MENYU', () => { this.game.state = 'MENU'; }, '#00f0ff');
   }
@@ -273,7 +424,6 @@ class UIManager {
     ctx.fillStyle = 'rgba(8, 10, 20, 0.95)';
     ctx.fillRect(0, 0, 1280, 720);
 
-    // Title
     ctx.fillStyle = '#00f0ff';
     ctx.font = '28px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
@@ -310,11 +460,9 @@ class UIManager {
       ctx.textAlign = 'center';
       ctx.fillText(s.name, cardX + 110, cardY + 35);
 
-      // Preview box
       ctx.fillStyle = '#1e293b';
       ctx.fillRect(cardX + 45, cardY + 55, 130, 130);
       
-      // Avatar preview
       ctx.fillStyle = s.color;
       ctx.fillRect(cardX + 95, cardY + 95, 30, 46);
       ctx.fillStyle = '#ffffff';
@@ -326,7 +474,6 @@ class UIManager {
       ctx.fillText(`Narxi: ${s.price === 0 ? 'Bepul' : s.price + ' tanga'}`, cardX + 110, cardY + 240);
       ctx.textAlign = 'left';
 
-      // Action button
       let btnText = 'OCHISH';
       let btnColor = s.color;
       let action = () => {};

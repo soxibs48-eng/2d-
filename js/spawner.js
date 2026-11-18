@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: PROCEDURAL SPAWNER (v2.2 DIVERSE)
+// PIXEL RUNNER: PROCEDURAL SPAWNER (v2.3 STAGE-AWARE)
 // ==========================================
 
 class Spawner {
@@ -15,88 +15,134 @@ class Spawner {
     this.spawnTimer = 1.2;
   }
 
-  update(delta, gameSpeed, obstacles, pickups) {
+  update(delta, gameSpeed, obstacles, pickups, stage = 1, bossActive = false) {
     this.spawnTimer -= delta;
 
     if (this.spawnTimer <= 0) {
-      this.spawnPattern(obstacles, pickups);
-      const baseGap = 450 + Math.random() * 210;
-      this.spawnTimer = Math.max(0.68, Math.min(1.85, baseGap / gameSpeed));
+      if (bossActive) {
+        this.spawnBossBattlePattern(obstacles, pickups);
+        this.spawnTimer = 1.4;
+      } else {
+        this.spawnStagePattern(obstacles, pickups, stage);
+        const baseGap = stage === 1 ? 480 : (stage === 2 ? 440 : 410);
+        this.spawnTimer = Math.max(0.65, Math.min(1.8, (baseGap + Math.random() * 180) / gameSpeed));
+      }
     }
   }
 
-  spawnPattern(obstacles, pickups) {
-    const roll = Math.floor(Math.random() * 10);
+  spawnBossBattlePattern(obstacles, pickups) {
+    // During boss battle: spawn EMP Orbs to damage boss, plus occasional low beam or saw to dodge
+    const roll = Math.random();
+    if (roll < 0.65) {
+      // Spawn EMP Orb
+      const empY = Math.random() > 0.5 ? this.floorY - 40 : this.ceilingY + 40;
+      pickups.push(new Pickup('emp_orb', this.spawnX, empY));
+      this.spawnCoinLine(pickups, this.spawnX + 60, empY, 3);
+    } else if (roll < 0.85) {
+      // Low laser wire to force sliding
+      obstacles.push(new Obstacle('low_beam', this.spawnX, this.floorY - 26));
+    } else {
+      // Tall spikes to force double jump
+      obstacles.push(new Obstacle('tall_spikes', this.spawnX, this.floorY - 25));
+    }
+  }
 
-    switch (roll) {
+  spawnStagePattern(obstacles, pickups, stage) {
+    // Stage 1 Patterns (Neon City: Learning jumps & slides)
+    if (stage === 1) {
+      const r = Math.floor(Math.random() * 5);
+      switch (r) {
+        case 0:
+          obstacles.push(new Obstacle('spike_floor', this.spawnX, this.floorY));
+          this.spawnCoinArc(pickups, this.spawnX - 40, this.floorY - 80, 4);
+          break;
+        case 1:
+          // Low beam (Learn to slide / lie down!)
+          obstacles.push(new Obstacle('low_beam', this.spawnX, this.floorY - 26));
+          this.spawnCoinLine(pickups, this.spawnX - 40, this.floorY - 15, 3);
+          break;
+        case 2:
+          obstacles.push(new Obstacle('spike_ceiling', this.spawnX, this.ceilingY));
+          this.spawnCoinArc(pickups, this.spawnX - 40, this.ceilingY + 80, 4);
+          break;
+        case 3:
+          // Tall spikes (Learn to Double Jump!)
+          obstacles.push(new Obstacle('tall_spikes', this.spawnX, this.floorY - 25));
+          this.spawnCoinArc(pickups, this.spawnX - 50, this.floorY - 150, 4);
+          break;
+        case 4:
+          this.spawnCoinLine(pickups, this.spawnX, this.floorY - 30, 5);
+          if (Math.random() > 0.5) this.spawnRandomPowerup(pickups, this.spawnX + 240, this.floorY - 30);
+          break;
+      }
+      return;
+    }
+
+    // Stage 2 Patterns (Gravity Anomaly: Heavy Inversions & Saws)
+    if (stage === 2) {
+      const r = Math.floor(Math.random() * 6);
+      switch (r) {
+        case 0:
+          // Gravity Portal + Saws
+          obstacles.push(new Obstacle('gravity_portal', this.spawnX, this.midY));
+          this.spawnCoinLine(pickups, this.spawnX - 80, this.floorY - 30, 3);
+          this.spawnCoinLine(pickups, this.spawnX + 80, this.ceilingY + 30, 3);
+          break;
+        case 1:
+          // Spinning Laser Saw on floor or ceiling
+          const sawY = Math.random() > 0.5 ? this.floorY - 30 : this.ceilingY + 30;
+          obstacles.push(new Obstacle('laser_saw', this.spawnX, sawY));
+          break;
+        case 2:
+          // Low beam on ceiling
+          obstacles.push(new Obstacle('low_beam', this.spawnX, this.ceilingY + 26));
+          this.spawnCoinLine(pickups, this.spawnX - 40, this.ceilingY + 15, 3);
+          break;
+        case 3:
+          // Split hazard
+          obstacles.push(new Obstacle('spike_floor', this.spawnX, this.floorY));
+          obstacles.push(new Obstacle('spike_ceiling', this.spawnX + 160, this.ceilingY));
+          break;
+        case 4:
+          obstacles.push(new Obstacle('tall_spikes', this.spawnX, this.floorY - 25));
+          this.spawnCoinArc(pickups, this.spawnX - 50, this.floorY - 150, 5);
+          break;
+        case 5:
+          this.spawnCoinLine(pickups, this.spawnX, this.ceilingY + 30, 6);
+          this.spawnRandomPowerup(pickups, this.spawnX + 280, this.ceilingY + 30);
+          break;
+      }
+      return;
+    }
+
+    // Stage 3 / Endless Patterns (Full Cyber Matrix)
+    const r = Math.floor(Math.random() * 8);
+    switch (r) {
       case 0:
-        // NEW: Low Beam! Requires sliding / lying down ('yotadigan')
-        // Suspended at Y = 545 (45px above floor), standing player hits it, sliding player passes under!
-        obstacles.push(new Obstacle('low_beam', this.spawnX, this.floorY - 26));
-        this.spawnCoinLine(pickups, this.spawnX - 40, this.floorY - 15, 3);
+        obstacles.push(new Obstacle('patrol_drone', this.spawnX, 320));
         break;
-
       case 1:
-        // NEW: Low Beam on Ceiling! (When running on ceiling, slide under it)
-        obstacles.push(new Obstacle('low_beam', this.spawnX, this.ceilingY + 26));
-        this.spawnCoinLine(pickups, this.spawnX - 40, this.ceilingY + 15, 3);
+        obstacles.push(new Obstacle('laser_saw', this.spawnX, this.floorY - 30));
+        obstacles.push(new Obstacle('laser_saw', this.spawnX + 160, this.ceilingY + 30));
         break;
-
       case 2:
-        // NEW: Tall Spikes Barrier! Requires Double Jump (2-marta sakrash)!
-        obstacles.push(new Obstacle('tall_spikes', this.spawnX, this.floorY - 25));
-        // High coin arc reachable by double jumping
-        this.spawnCoinArc(pickups, this.spawnX - 50, this.floorY - 150, 5);
+        obstacles.push(new Obstacle('low_beam', this.spawnX, this.floorY - 26));
         break;
-
       case 3:
-        // NEW: Tall Spikes on Ceiling!
-        obstacles.push(new Obstacle('tall_spikes', this.spawnX, this.ceilingY + 25));
-        this.spawnCoinArc(pickups, this.spawnX - 50, this.ceilingY + 150, 5);
+        obstacles.push(new Obstacle('tall_spikes', this.spawnX, this.floorY - 25));
         break;
-
       case 4:
-        // NEW: Patrol Drone (moving horizontally)
-        const droneY = 280 + Math.random() * 150;
-        obstacles.push(new Obstacle('patrol_drone', this.spawnX, droneY));
-        this.spawnCoinLine(pickups, this.spawnX + 60, this.floorY - 20, 3);
-        break;
-
-      case 5:
-        // Spinning Laser Saw obstacle
-        const sawY = Math.random() > 0.5 ? this.floorY - 30 : this.ceilingY + 30;
-        obstacles.push(new Obstacle('laser_saw', this.spawnX, sawY));
-        this.spawnCoinArc(pickups, this.spawnX - 40, sawY > this.midY ? sawY - 90 : sawY + 90, 4);
-        break;
-
-      case 6:
-        // Anti-Gravity Portal!
         obstacles.push(new Obstacle('gravity_portal', this.spawnX, this.midY));
-        this.spawnCoinLine(pickups, this.spawnX - 100, this.floorY - 30, 3);
-        this.spawnCoinLine(pickups, this.spawnX + 80, this.ceilingY + 30, 3);
         break;
-
+      case 5:
+        obstacles.push(new Obstacle('laser_barrier', this.spawnX, this.floorY - 50));
+        break;
+      case 6:
+        obstacles.push(new Obstacle('floating_mine', this.spawnX, 340));
+        break;
       case 7:
-        // Split Hazard: Spikes on floor and ceiling offset
-        obstacles.push(new Obstacle('spike_floor', this.spawnX, this.floorY));
-        obstacles.push(new Obstacle('spike_ceiling', this.spawnX + 180, this.ceilingY));
-        this.spawnCoinLine(pickups, this.spawnX, this.midY, 4);
-        break;
-
-      case 8:
-        // Laser Wall
-        const laserY = Math.random() > 0.5 ? this.floorY - 50 : this.ceilingY + 50;
-        obstacles.push(new Obstacle('laser_barrier', this.spawnX, laserY));
-        const safeY = laserY > this.midY ? this.ceilingY + 40 : this.floorY - 40;
-        this.spawnCoinLine(pickups, this.spawnX - 30, safeY, 4);
-        break;
-
-      case 9:
-        // Pure Coin Wave + Rare Powerup
         this.spawnCoinLine(pickups, this.spawnX, this.floorY - 30, 6);
-        if (Math.random() > 0.4) {
-          this.spawnRandomPowerup(pickups, this.spawnX + 300, this.floorY - 30);
-        }
+        this.spawnRandomPowerup(pickups, this.spawnX + 280, this.midY);
         break;
     }
   }
