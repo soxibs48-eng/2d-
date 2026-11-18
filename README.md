@@ -1,108 +1,65 @@
-# PIXEL RUNNER (Antigravitatsiya mexanikasi bilan)
-**Game Development Capstone Project — 2D Endless Runner (Godot Engine 4.x)**
+# PIXEL RUNNER: ANTI-GRAVITY PROTOCOL (Versiya 3.0)
+**Full-Stack Game Development — 2D Runner (HTML5 Web & Godot Engine 4.x)**
+
+[![Test Suite](https://img.shields.io/badge/CI%2FQA%20Tests-61%20PASSED-brightgreen.svg)]()
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Windows%20%7C%20Mobile-blue.svg)]()
+[![GitHub Repo](https://img.shields.io/badge/GitHub-2d--runner-orange.svg)](https://github.com/soxibs48-eng/2d-)
 
 ---
 
-## 📖 Loyiha Haqida
-**"Pixel Runner"** — bu retro pixel-art uslubidagi, innovatsion **Anti-Gravity (Antigravitatsiya)** mexanikasiga asoslangan 2D cheksiz yugurish (Endless Runner) o'yini. Godot Engine 4.x uchun to'liq modulli, kengaytiriladigan va data-driven arxitektura asosida ishlab chiqilgan.
+## 🎮 Jonli O'yin (Live Demo)
+O'yin mahalliy kompyuteringizda quyidagi manzilda ishga tushirilgan:
+- **Web URL:** [http://localhost:8000](http://localhost:8000)
+- **GitHub Repozitoriyasi:** [https://github.com/soxibs48-eng/2d-](https://github.com/soxibs48-eng/2d-)
+
+---
+
+## 🌟 Versiya 3.0: Kengaytirilgan Yangi Funksiyalar (TZ v3.0)
+
+1. ☀️ **Dinamik Ob-havo va Vaqt Sikli (Weather & Time Cycle System):**
+   - **Vaqt sikli:** Tong (Dawn), Kunduz (Day), Shom (Sunset) va Tun (Night — miltillovchi yulduzlar bilan).
+   - **Ob-havo turlari:** Musaffo (Clear), Kiber Yomg'ir (Rain — polda suv to'lqinlari), Kiber Qor (Snow) va Kiber Bo'ron (Cyber Storm — chaqmoq chaqnashi va guldurash SFX).
+   - Canvas Modulate va ambient yorug'lik silliq o'zgaradi (60 FPS barqaror).
+
+2. 🤖 **Hamroh Jonzotlar / Dronlar (Companion Pet System):**
+   - Qahramonga silliq ergashuvchi (spring lerp), vertikal suzuvchi va gravitatsiya o'zgarganda teskari buriluvchi kiber hamrohlar:
+     - **Magno (Magnet Bot):** 240px radiusdagi tangalarni avtomatik o'ziga tortadi.
+     - **Aegis (Shield Drone):** Har 60 sekundda o'yinchiga bepul himoya qalqoni (Shield) hadya etadi.
+     - **Sparky (Neo Fox):** Har 75 metrda +1 bonus tanga va +30% tezroq Combo/Fever beradi.
+   - Tanlash va ochish: Yangi **HAMROHLAR (PETS)** do'koni orqali.
+
+3. 🏆 **Kunlik Vazifalar va Yutuqlar (Daily Quests & Missions):**
+   - Haqiqiy sana (`YYYY-MM-DD`) bo'yicha har kuni yangilanuvchi 3 ta dinamik vazifa:
+     - *Marafonchi:* 1000m masofa bosib o'tish (+150 tanga)
+     - *Tanga ovchisi:* 50 ta tanga yig'ish (+200 tanga)
+     - *Gravitatsiya hakkeri:* 3 marta shiftga sakrash (+150 tanga)
+     - *Fever ustasi:* 1 marta Fever Hyper Mode ga erishish (+250 tanga)
+   - Jonli progress shkalasi va **MUKOFOTNI OLISH (CLAIM)** tizimi.
+
+4. 🔥 **Combo & Fever Hyper Drive Rejimi (ComboSystem):**
+   - Tangalar, to'siqlardan qochish, double jump va sirpanish orqali Combo shkalasi to'ladi.
+   - Shkala 100% ga yetganda **FEVER HYPER DRIVE** rejimiga o'tadi:
+     - Qahramon super daxlsizlik (invulnerable aura) oladi.
+     - Ekranda kiber tezlik chiziqlari va neon vinyetka paydo bo'ladi.
+     - **Barcha yig'ilgan tangalar 3x baravarga ko'paytiriladi!**
 
 ---
 
 ## 🎮 Boshqaruv (Controls)
 
-| Harakat | Klaviatura | Gamepad (Controller) | Sensorli / Touch |
-| :--- | :--- | :--- | :--- |
-| **Sakrash (Jump)** | `Space`, `W`, `Up Arrow` | `A` (Button 0), D-pad Up | **JUMP** tugmasi |
-| **Egilish (Slide) / Fast Fall** | `S`, `Down Arrow` | `B` (Button 1), D-pad Down | **SLIDE** tugmasi |
-| **Antigravitatsiya (Flip)** | `Shift`, `F` | `Y` (Button 3), `X` (Button 2) | **FLIP GRAVITY** |
-| **Pauza (Pause)** | `Escape`, `P` | `Start` (Button 6) | **II** tugmasi |
-
-Batafsil boshqaruv hujjati: [docs/controls.md](file:///c:/Users/HP%20PC/OYIN/2d%20oyin/docs/controls.md)
-
----
-
-## ⚙️ Asosiy Tizimlar va Arxitektura (Section 4)
-
-1. **Game State Manager (`scripts/managers/game_manager.gd`):**
-   - Holatlar: `MENU`, `PLAYING`, `PAUSED`, `GAME_OVER`, `VICTORY`.
-   - Dinamik tezlik: $\text{speed} = \min(\text{base\_speed} + \text{distance} \times \text{acceleration\_rate},\ \text{max\_speed})$.
-   - Antigravitatsiya va power-up taymerlari.
-2. **Camera System (`scripts/systems/camera_system.gd`):**
-   - Screen Shake (Trauma-based tebranish) — to'qnashuv, qalqon sinishi va gravitatsiya o'zgarishida.
-   - Tezlik oshishi bilan dinamik Zoom (FOV kengayishi).
-3. **Audio Manager (`scripts/managers/sound_manager.gd`):**
-   - Chiptune BGM va 8 kanalli SFX polifoniya puli.
-4. **Save/Load System (`scripts/systems/save_system.gd`):**
-   - Yuqori rekord, tangalar balansi, ochilgan skinlar va sozlamalarni `user://` da saqlash.
-5. **Level & Scene Manager (`scripts/managers/scene_manager.gd`):**
-   - Silliq ekran qorayishi (Fade in / Fade out) va sahna yuklash tranzitsiyalari.
-6. **Spawner System (`scripts/systems/spawner_system.gd`):**
-   - To'siqlar, tangalar va power-uplarni tezlikka mos adolatli generatsiya qilish.
-7. **Data-Driven Configuration (`data/`):**
-   - `items/items.json`: Skinlar va quvvatlar xususiyatlari.
-   - `enemies/hazards.json`: To'siqlar ko'rsatkichlari.
-   - `levels/speed_curve.json`: Qiyinlik egri chizig'i.
-   - `quests/achievements.json`: Yutuqlar ro'yxati.
-
----
-
-## 📁 Papka Tuzilmasi (TZ v2.0 Standarti)
-
-```text
-2d oyin/
-├── project.godot              # Godot 4 konfiguratsiyasi
-├── export_presets.cfg         # Windows va Web eksport sozlamalari
-├── data/                      # JSON ma'lumotlar
-│   ├── items/items.json
-│   ├── enemies/hazards.json
-│   ├── levels/speed_curve.json
-│   └── quests/achievements.json
-├── docs/                      # Texnik hujjatlar
-│   ├── GDD.md                 # Game Design Document
-│   ├── controls.md            # Boshqaruv qo'llanmasi
-│   └── changelog.md           # O'zgarishlar jurnali
-├── scenes/
-│   ├── main/main.tscn         # Root orkestrator sahnasi
-│   ├── levels/runner_world.tscn # O'yin maydoni, fon va relslar
-│   ├── player/player.tscn     # Qahramon
-│   ├── enemies/               # To'siqlar sahnalari
-│   ├── objects/               # Tangalar va power-up'lar
-│   ├── menus/                 # Barcha menyular (Main, Pause, GameOver, Shop, Settings)
-│   └── ui/hud.tscn            # Gameplay HUD va sensorli tugmalar
-├── scripts/
-│   ├── managers/              # GameManager, SoundManager, SceneManager
-│   ├── systems/               # SaveSystem, CameraSystem, SpawnerSystem
-│   ├── gameplay/              # PlayerController, ParallaxScroller, Obstacle, Pickup
-│   ├── ai/                    # DroneHazard AI
-│   └── data/                  # GameData JSON parser
-├── assets/
-│   ├── audio/
-│   │   ├── music/             # bgm.wav
-│   │   └── sfx/               # jump, slide, flip, coin, hit, powerup...
-│   ├── backgrounds/           # Sky, far/mid skyline
-│   ├── tilesets/              # Floor, ceiling platformalari
-│   ├── sprites/               # 3 ta skin animatsiyalari
-│   └── ui/                    # Tugmalar, piktogrammalar
-└── tests/
-    ├── test_runner.gd         # GDScript avtomatlashtirilgan test
-    └── run_tests.py           # Python CI/QA tekshiruv skripti
-```
-
----
-
-## 🚀 Ishga Tushirish va O'ynash
-
-1. **Godot Engine 4.x** (Standard versiya) dasturini ishga tushiring.
-2. **Import** tugmasini bosib, ushbu papkadagi `project.godot` faylini tanlang.
-3. Loyihani ochib, **F5** tugmasini bosing.
-4. O'yin to'liq ishga tushadi!
+| Harakat | Klaviatura | Sensorli Tugmalar (Mobile) |
+| :--- | :--- | :--- |
+| **Sakrash (1x/2x Jump)** | `Space` / `W` / `Up Arrow` | **JUMP (2X)** |
+| **Yotish / Sirpanish (Slide)** | `S` / `Down Arrow` (bosib turish) | **SLIDE (YOTISH)** |
+| **Cyber Dash (Tezlanish)** | `E` | **DASH** |
+| **Antigravitatsiya (Flip)** | `Shift` / `F` | **FLIP GRAVITY** |
+| **Pauza** | `Escape` / `P` | **II** tugmasi |
 
 ---
 
 ## 🧪 Avtomatlashtirilgan Testlash
-Loyiha yaxlitligini tekshirish uchun konsolda quyidagi buyruqni bering:
+Loyiha CI/QA sinovlarini o'tkazish uchun:
 ```powershell
 python tests/run_tests.py
 ```
-Natija: **40 ta testdan 40 tasi muvaffaqiyatli (0 xato)**.
-
+Natija: **61 ta testdan 61 tasi muvaffaqiyatli (0 xato)**.

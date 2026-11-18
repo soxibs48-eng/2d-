@@ -1,6 +1,6 @@
-// ==========================================
-// PIXEL RUNNER: CANVAS UI SYSTEM (v2.3 STAGE CAMPAIGN)
-// ==========================================
+// ========================================================
+// PIXEL RUNNER: CANVAS UI SYSTEM (v3.0 EXTENDED EDITION)
+// ========================================================
 
 class UIManager {
   constructor(game) {
@@ -90,6 +90,12 @@ class UIManager {
       case 'SHOP':
         this.drawShop(ctx);
         break;
+      case 'PETS':
+        this.drawPetsShop(ctx);
+        break;
+      case 'QUESTS':
+        this.drawQuestsModal(ctx);
+        break;
       case 'SETTINGS':
         this.drawSettings(ctx);
         break;
@@ -100,7 +106,7 @@ class UIManager {
 
   drawHUD(ctx) {
     // 1. Top Glassmorphism Bar
-    ctx.fillStyle = 'rgba(10, 15, 30, 0.85)';
+    ctx.fillStyle = 'rgba(10, 15, 30, 0.88)';
     ctx.fillRect(0, 0, 1280, 68);
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 1.5;
@@ -108,45 +114,101 @@ class UIManager {
 
     // Distance or Stage Progress
     ctx.fillStyle = '#00f0ff';
-    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.font = '13px "Press Start 2P", monospace';
     if (this.game.gameMode === 'campaign') {
       const target = this.game.getStageTarget(this.game.currentStage);
       const displayDist = Math.min(target, Math.floor(this.game.distance));
-      ctx.fillText(`${this.game.currentStage}-BOSQICH: ${displayDist}/${target}m`, 30, 42);
+      ctx.fillText(`${this.game.currentStage}-BOSQICH: ${displayDist}/${target}m`, 25, 42);
     } else {
-      ctx.fillText(`MASOFA: ${Math.floor(this.game.distance)}m`, 30, 42);
+      ctx.fillText(`MASOFA: ${Math.floor(this.game.distance)}m`, 25, 42);
     }
 
-    // Coins
+    // Coins Counter
     if (this.coinIcon.complete) {
-      ctx.drawImage(this.coinIcon, 390, 22, 24, 24);
+      ctx.drawImage(this.coinIcon, 340, 22, 24, 24);
     }
     ctx.fillStyle = '#ffd700';
-    ctx.font = '16px "Press Start 2P", monospace';
-    ctx.fillText(`${this.game.coins}`, 425, 42);
+    ctx.font = '15px "Press Start 2P", monospace';
+    ctx.fillText(`${this.game.coins}`, 372, 42);
 
     // Speedometer
     const speedKmh = Math.floor(this.game.gameSpeed);
     ctx.fillStyle = '#ff00aa';
-    ctx.font = '12px "Press Start 2P", monospace';
-    ctx.fillText(`${speedKmh} KM/H`, 520, 42);
+    ctx.font = '11px "Press Start 2P", monospace';
+    ctx.fillText(`${speedKmh}KM/H`, 440, 42);
 
-    // Combo Meter
-    ctx.fillStyle = '#00ffcc';
-    ctx.font = '12px "Press Start 2P", monospace';
-    ctx.fillText(`KOMBO x${this.game.comboMultiplier.toFixed(1)}`, 680, 42);
+    // 2. CENTER: DYNAMIC FEVER & COMBO BAR
+    const comboSys = this.game.comboSys;
+    const barX = 540;
+    const barY = 16;
+    const barW = 280;
+    const barH = 34;
 
-    // Dash Status
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    ctx.fillRect(barX, barY, barW, barH);
+    ctx.strokeStyle = comboSys.isFeverActive ? '#ff00aa' : '#00f0ff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(barX, barY, barW, barH);
+
+    if (comboSys.isFeverActive) {
+      // Animated rainbow gradient in Fever
+      const fillW = (barW - 4) * (comboSys.feverTimer / comboSys.feverDuration);
+      const feverGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+      feverGrad.addColorStop(0, '#ff0077');
+      feverGrad.addColorStop(0.5, '#ffd700');
+      feverGrad.addColorStop(1, '#00ffcc');
+      ctx.fillStyle = feverGrad;
+      ctx.fillRect(barX + 2, barY + 2, fillW, barH - 4);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = '#ff00d4';
+      ctx.shadowBlur = 8;
+      ctx.fillText(`🔥 FEVER: ${comboSys.feverTimer.toFixed(1)}s (3X COINS) 🔥`, barX + barW / 2, barY + 22);
+      ctx.shadowBlur = 0;
+      ctx.textAlign = 'left';
+    } else {
+      // Normal Combo Fill Bar
+      const fillW = (barW - 4) * (comboSys.feverMeter / 100);
+      ctx.fillStyle = comboSys.feverMeter > 80 ? 'rgba(255, 0, 120, 0.8)' : 'rgba(0, 240, 255, 0.6)';
+      ctx.fillRect(barX + 2, barY + 2, fillW, barH - 4);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`KOMBO x${comboSys.comboMultiplier.toFixed(1)} [${Math.floor(comboSys.feverMeter)}%]`, barX + barW / 2, barY + 22);
+      ctx.textAlign = 'left';
+    }
+
+    // 3. RIGHT: WEATHER & PET INDICATOR
+    const weatherSys = this.game.weatherSys;
+    const petSys = this.game.companionPet;
+
+    // Weather Badge
+    ctx.fillStyle = '#88aacc';
+    ctx.font = '10px "Press Start 2P", monospace';
+    const weatherText = `${weatherSys.getCurrentPhaseName().split(' ')[0]} | ${weatherSys.getCurrentWeatherName()}`;
+    ctx.fillText(weatherText, 840, 32);
+
+    // Pet Badge
+    if (petSys && petSys.type !== 'none') {
+      const petName = petSys.petDatabase[petSys.type]?.name.split(' ')[0] || 'PET';
+      const petColor = petSys.petDatabase[petSys.type]?.color || '#00f0ff';
+      ctx.fillStyle = petColor;
+      ctx.fillText(`PET: ${petName}`, 840, 52);
+    }
+
+    // Dash (E)
     const dashReady = this.game.player.dashCooldown <= 0;
     ctx.fillStyle = dashReady ? '#00ffff' : '#778899';
-    ctx.font = '11px "Press Start 2P", monospace';
-    const dashText = dashReady ? 'DASH (E): TAYYOR' : `DASH: ${this.game.player.dashCooldown.toFixed(1)}s`;
-    ctx.fillText(dashText, 880, 42);
+    ctx.font = '10px "Press Start 2P", monospace';
+    ctx.fillText(dashReady ? 'DASH: OK' : `DASH:${this.game.player.dashCooldown.toFixed(1)}s`, 1080, 42);
 
     // Pause button
     this.addButton('pause', 1210, 14, 40, 40, 'II', () => this.game.pauseGame(), '#00f0ff');
 
-    // 2. Stage Progress Line (Top line)
+    // 4. Stage Progress Line (Top line)
     if (this.game.gameMode === 'campaign') {
       const target = this.game.getStageTarget(this.game.currentStage);
       const prog = Math.min(1.0, this.game.distance / target);
@@ -156,7 +218,7 @@ class UIManager {
       ctx.fillRect(0, 68, 1280 * prog, 4);
     }
 
-    // 3. Power-up Badges (Left Column)
+    // 5. Power-up Badges (Left Column)
     let badgeX = 30;
     const badgeY = 82;
 
@@ -179,7 +241,7 @@ class UIManager {
     // Controls hints on bottom
     ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.font = '13px "Rajdhani", sans-serif';
-    ctx.fillText('SPACE/W: 2x Sakrash (Double Jump)  |  S (Ushlab turish): Yotish/Sirpanish  |  E: Cyber Dash  |  SHIFT/F: Flip', 30, 705);
+    ctx.fillText('SPACE/W: 2x Sakrash (Double Jump)  |  S (Ushlab turish): Yotish/Sirpanish  |  E: Dash  |  SHIFT/F: Flip', 30, 705);
   }
 
   drawBadge(ctx, x, y, icon, label, color) {
@@ -198,31 +260,36 @@ class UIManager {
   }
 
   drawMainMenu(ctx) {
-    ctx.fillStyle = 'rgba(8, 10, 20, 0.78)';
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.82)';
     ctx.fillRect(0, 0, 1280, 720);
 
     ctx.fillStyle = '#00f0ff';
-    ctx.font = '50px "Press Start 2P", monospace';
+    ctx.font = '48px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
     ctx.shadowColor = '#00f0ff';
     ctx.shadowBlur = 24;
-    ctx.fillText('PIXEL RUNNER', 640, 190);
+    ctx.fillText('PIXEL RUNNER', 640, 175);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ff2288';
-    ctx.font = '18px "Press Start 2P", monospace';
-    ctx.fillText('— ANTI-GRAVITY PROTOCOL —', 640, 240);
+    ctx.font = '16px "Press Start 2P", monospace';
+    ctx.fillText('— ANTI-GRAVITY PROTOCOL (v3.0) —', 640, 225);
 
     ctx.fillStyle = '#8899aa';
-    ctx.font = '13px "Press Start 2P", monospace';
-    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 290);
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 275);
     ctx.textAlign = 'left';
 
-    // Buttons: Campaign Mode vs Endless Mode
-    this.addButton('campaign', 460, 335, 360, 56, "BOSQICHLI REJIM (1-3)", () => { this.game.state = 'LEVEL_SELECT'; }, '#00ffcc');
-    this.addButton('endless', 460, 405, 360, 52, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
-    this.addButton('shop', 460, 470, 360, 50, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
-    this.addButton('settings', 460, 530, 360, 50, "SOZLAMALAR", () => { this.game.state = 'SETTINGS'; }, '#00f0ff');
+    // 2-COLUMN BUTTON LAYOUT FOR BALANCED DESIGN
+    // Left Column
+    this.addButton('campaign', 260, 325, 360, 56, "BOSQICHLI REJIM (1-3)", () => { this.game.state = 'LEVEL_SELECT'; }, '#00ffcc');
+    this.addButton('endless', 260, 395, 360, 52, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
+    this.addButton('shop', 260, 460, 360, 52, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
+
+    // Right Column
+    this.addButton('quests', 660, 325, 360, 56, "KUNLIK VAZIFALAR 🏆", () => { this.game.state = 'QUESTS'; }, '#00f0ff');
+    this.addButton('pets', 660, 395, 360, 52, "HAMROHLAR (PETS) 🤖", () => { this.game.state = 'PETS'; }, '#00ffaa');
+    this.addButton('settings', 660, 460, 360, 52, "SOZLAMALAR ⚙️", () => { this.game.state = 'SETTINGS'; }, '#00b0ff');
   }
 
   drawLevelSelect(ctx) {
@@ -248,99 +315,252 @@ class UIManager {
       { num: 3, name: 'CYBER MATRIX & BOSS', dist: 'BOSS', desc: 'Kiber Goliath dushmani jangi!', color: '#ff2255' }
     ];
 
-    stages.forEach((stg, idx) => {
+    stages.forEach((st, idx) => {
       const cardX = 140 + idx * 350;
-      const cardY = 160;
-      const isUnlocked = unlocked.includes(stg.num);
-      const stars = starsData[stg.num] || 0;
+      const cardY = 180;
+      const cardW = 300;
+      const cardH = 380;
+      const isUnlocked = unlocked.includes(st.num);
 
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(cardX, cardY, 300, 380);
-      ctx.strokeStyle = isUnlocked ? stg.color : '#334455';
+      ctx.fillStyle = isUnlocked ? 'rgba(15, 23, 42, 0.92)' : 'rgba(20, 20, 30, 0.6)';
+      ctx.fillRect(cardX, cardY, cardW, cardH);
+      ctx.strokeStyle = isUnlocked ? st.color : '#444455';
       ctx.lineWidth = 3;
-      ctx.strokeRect(cardX, cardY, 300, 380);
+      ctx.strokeRect(cardX, cardY, cardW, cardH);
 
-      // Stage Header
-      ctx.fillStyle = isUnlocked ? stg.color : '#556677';
-      ctx.font = '16px "Press Start 2P", monospace';
+      ctx.fillStyle = isUnlocked ? st.color : '#666677';
+      ctx.font = '18px "Press Start 2P", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(`${stg.num}-BOSQICH`, cardX + 150, cardY + 45);
+      ctx.fillText(`${st.num}-BOSQICH`, cardX + cardW / 2, cardY + 45);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '13px "Press Start 2P", monospace';
-      ctx.fillText(stg.name, cardX + 150, cardY + 80);
+      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.fillText(st.name, cardX + cardW / 2, cardY + 80);
 
-      // Stars display
-      let starStr = '☆☆☆';
-      if (stars === 1) starStr = '★☆☆';
-      else if (stars === 2) starStr = '★★☆';
-      else if (stars === 3) starStr = '★★★';
+      ctx.fillStyle = '#88aacc';
+      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.fillText(st.desc, cardX + cardW / 2, cardY + 125);
+
+      ctx.fillStyle = '#ffd700';
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.fillText(`Masofa: ${st.dist}`, cardX + cardW / 2, cardY + 175);
+
+      // Stars
+      const starsEarned = starsData[st.num] || 0;
+      let starsStr = '';
+      for (let s = 1; s <= 3; s++) {
+        starsStr += s <= starsEarned ? '★ ' : '☆ ';
+      }
       ctx.fillStyle = '#ffd700';
       ctx.font = '22px "Press Start 2P", monospace';
-      ctx.fillText(isUnlocked ? starStr : '🔒', cardX + 150, cardY + 130);
+      ctx.fillText(starsStr, cardX + cardW / 2, cardY + 230);
 
-      // Target distance
-      ctx.fillStyle = '#00ffcc';
-      ctx.font = '14px "Press Start 2P", monospace';
-      ctx.fillText(`Masofa: ${stg.dist}`, cardX + 150, cardY + 180);
-
-      ctx.fillStyle = '#8899aa';
-      ctx.font = '13px "Rajdhani", sans-serif';
-      ctx.fillText(stg.desc, cardX + 150, cardY + 230);
-      ctx.textAlign = 'left';
-
-      // Play Button
       if (isUnlocked) {
-        this.addButton(`stage_${stg.num}`, cardX + 40, cardY + 280, 220, 50, "O'YNASH", () => {
-          this.game.startStage(stg.num);
-        }, stg.color);
+        this.addButton(`stage_${st.num}`, cardX + 30, cardY + 290, 240, 50, "BOSHLASH", () => {
+          this.game.startStage(st.num);
+        }, st.color);
       } else {
-        ctx.fillStyle = '#445566';
-        ctx.fillRect(cardX + 40, cardY + 280, 220, 50);
-        ctx.fillStyle = '#8899aa';
+        ctx.fillStyle = '#888899';
         ctx.font = '12px "Press Start 2P", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText('QULFLANGAN', cardX + 150, cardY + 310);
-        ctx.textAlign = 'left';
+        ctx.fillText("QULFLANGAN 🔒", cardX + cardW / 2, cardY + 320);
       }
     });
 
-    this.addButton('level_back', 540, 580, 200, 46, 'ORTGA', () => { this.game.state = 'MENU'; }, '#00f0ff');
+    ctx.textAlign = 'left';
+    this.addButton('ls_back', 520, 600, 240, 48, "ASOSIY MENYU", () => {
+      this.game.state = 'MENU';
+    }, '#00f0ff');
+  }
+
+  drawQuestsModal(ctx) {
+    ctx.fillStyle = 'rgba(8, 12, 24, 0.96)';
+    ctx.fillRect(0, 0, 1280, 720);
+
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '28px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("KUNLIK VAZIFALAR (DAILY QUESTS)", 640, 75);
+
+    const qSys = this.game.dailyQuests;
+    ctx.fillStyle = '#8899aa';
+    ctx.font = '13px "Press Start 2P", monospace';
+    ctx.fillText(`BUGUNGI SANA: ${qSys.todayStr}  |  YANGILANISH: HAR KUNI`, 640, 115);
+
+    const quests = qSys.activeQuests;
+    quests.forEach((q, idx) => {
+      const cardY = 160 + idx * 130;
+      const cardX = 200;
+      const cardW = 880;
+      const cardH = 110;
+
+      ctx.fillStyle = q.completed ? 'rgba(10, 35, 30, 0.9)' : 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(cardX, cardY, cardW, cardH);
+      ctx.strokeStyle = q.completed ? '#00ffaa' : '#00b0ff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(cardX, cardY, cardW, cardH);
+
+      // Quest Title & Desc
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.fillText(q.title, cardX + 25, cardY + 34);
+
+      ctx.fillStyle = '#88aacc';
+      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.fillText(q.desc, cardX + 25, cardY + 60);
+
+      // Progress Bar
+      const prog = Math.min(1.0, q.current / q.target);
+      const barW = 420;
+      const barH = 16;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(cardX + 25, cardY + 74, barW, barH);
+      ctx.fillStyle = q.completed ? '#00ffaa' : '#00f0ff';
+      ctx.fillRect(cardX + 25, cardY + 74, barW * prog, barH);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cardX + 25, cardY + 74, barW, barH);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.fillText(`${q.current} / ${q.target} ${q.unit}`, cardX + 460, cardY + 86);
+
+      // Reward & Claim Button
+      if (q.claimed) {
+        ctx.fillStyle = '#64748b';
+        ctx.font = '12px "Press Start 2P", monospace';
+        ctx.fillText("✓ OLINDI", cardX + 720, cardY + 60);
+      } else if (q.completed) {
+        this.addButton(`claim_${q.id}`, cardX + 680, cardY + 32, 170, 48, `OLISH (+${q.reward})`, () => {
+          qSys.claimReward(q.id);
+        }, '#ffd700');
+      } else {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = '11px "Press Start 2P", monospace';
+        ctx.fillText(`MUKOFOT: +${q.reward}`, cardX + 690, cardY + 60);
+      }
+    });
+
+    // Reset Quests for testing & Back Button
+    this.addButton('quest_reset', 320, 595, 280, 48, 'YANGILASH (TEST)', () => {
+      qSys.loadOrGenerateQuests(true);
+      AudioSys.playSFX('powerup');
+    }, '#ffaa00');
+
+    this.addButton('quest_back', 680, 595, 280, 48, 'ASOSIY MENYU', () => {
+      this.game.state = 'MENU';
+    }, '#00f0ff');
+  }
+
+  drawPetsShop(ctx) {
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.95)';
+    ctx.fillRect(0, 0, 1280, 720);
+
+    ctx.fillStyle = '#00ffaa';
+    ctx.font = '28px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("HAMROH JONZOTLAR (PET DRONES)", 640, 75);
+
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '15px "Press Start 2P", monospace';
+    ctx.fillText(`JAMI TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 115);
+    ctx.textAlign = 'left';
+
+    const petSys = this.game.companionPet;
+    const unlocked = StorageManager.getUnlockedPets();
+    const equipped = StorageManager.getEquippedPet();
+
+    const petList = [
+      { id: 'magnet_bot', name: 'MAGNO (MAGNET BOT)', price: 0, color: '#00f0ff', desc: '240px masofadagi barcha tangalarni avtomatik tortadi.' },
+      { id: 'shield_drone', name: 'AEGIS (SHIELD DRONE)', price: 150, color: '#00ffaa', desc: 'Har 60s da qahramonga avtomatik himoya qalqoni beradi.' },
+      { id: 'sparky', name: 'SPARKY (NEO FOX)', price: 250, color: '#ffd700', desc: 'Har 75m da +1 bonus tanga va +30% tezroq Combo/Fever beradi.' }
+    ];
+
+    petList.forEach((p, idx) => {
+      const cardX = 140 + idx * 350;
+      const cardY = 160;
+      const cardW = 300;
+      const cardH = 410;
+      const isUnlocked = unlocked.includes(p.id);
+      const isEquipped = equipped === p.id;
+
+      ctx.fillStyle = isEquipped ? 'rgba(10, 35, 30, 0.92)' : 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(cardX, cardY, cardW, cardH);
+      ctx.strokeStyle = isEquipped ? '#00ffaa' : p.color;
+      ctx.lineWidth = isEquipped ? 3 : 2;
+      ctx.strokeRect(cardX, cardY, cardW, cardH);
+
+      // Pet Title
+      ctx.fillStyle = p.color;
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.name, cardX + cardW / 2, cardY + 45);
+
+      // Description
+      ctx.fillStyle = '#88aacc';
+      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.fillText(p.desc, cardX + cardW / 2, cardY + 120);
+
+      // Price
+      ctx.fillStyle = '#ffd700';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText(p.price === 0 ? 'NARXI: BEPUL' : `NARXI: ${p.price} TANGA`, cardX + cardW / 2, cardY + 230);
+
+      // Action Button
+      if (isEquipped) {
+        ctx.fillStyle = '#00ffaa';
+        ctx.font = '14px "Press Start 2P", monospace';
+        ctx.fillText("JIHOZLANGAN ✓", cardX + cardW / 2, cardY + 340);
+      } else if (isUnlocked) {
+        this.addButton(`pet_equip_${p.id}`, cardX + 30, cardY + 315, 240, 48, "TANLASH", () => {
+          petSys.setPet(p.id);
+          AudioSys.playSFX('powerup');
+        }, '#00ffaa');
+      } else {
+        const canBuy = StorageManager.getTotalCoins() >= p.price;
+        this.addButton(`pet_buy_${p.id}`, cardX + 30, cardY + 315, 240, 48, `SOTIB OLISH`, () => {
+          if (StorageManager.spendCoins(p.price)) {
+            StorageManager.unlockPet(p.id);
+            petSys.setPet(p.id);
+            AudioSys.playSFX('powerup');
+          }
+        }, canBuy ? '#ffd700' : '#666677');
+      }
+    });
+
+    ctx.textAlign = 'left';
+    this.addButton('pets_back', 520, 610, 240, 48, "ASOSIY MENYU", () => {
+      this.game.state = 'MENU';
+    }, '#00f0ff');
   }
 
   drawStageClear(ctx) {
-    ctx.fillStyle = 'rgba(8, 20, 16, 0.9)';
+    ctx.fillStyle = 'rgba(8, 20, 15, 0.9)';
     ctx.fillRect(0, 0, 1280, 720);
 
-    ctx.fillStyle = '#0c1a18';
-    ctx.fillRect(400, 120, 480, 460);
+    ctx.fillStyle = '#0f291e';
+    ctx.fillRect(400, 120, 480, 480);
     ctx.strokeStyle = '#00ffcc';
     ctx.lineWidth = 3;
-    ctx.strokeRect(400, 120, 480, 460);
+    ctx.strokeRect(400, 120, 480, 480);
 
     ctx.fillStyle = '#00ffcc';
-    ctx.font = '26px "Press Start 2P", monospace';
+    ctx.font = '28px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText("BOSQICH YAKUNLANDI!", 640, 185);
+    ctx.fillText(`${this.game.currentStage}-BOSQICH YAKUNLANDI!`, 640, 185);
 
-    // Stars
     ctx.fillStyle = '#ffd700';
-    ctx.font = '32px "Press Start 2P", monospace';
-    ctx.fillText('★★★', 640, 240);
+    ctx.font = '26px "Press Start 2P", monospace';
+    ctx.fillText("★★★", 640, 245);
 
     ctx.fillStyle = '#ffffff';
     ctx.font = '14px "Press Start 2P", monospace';
-    ctx.fillText(`${this.game.currentStage}-BOSQICH TO'LIQ BOSIB O'TILDI!`, 640, 290);
-
-    ctx.fillStyle = '#ffd700';
-    ctx.fillText(`Mukofot: +${this.game.stageBonus} Tangalar!`, 640, 335);
-
-    ctx.fillStyle = '#8899aa';
-    ctx.fillText(`Jami tangalar: ${StorageManager.getTotalCoins()}`, 640, 375);
+    ctx.fillText(`Mukofot: +${this.game.stageBonus} Tanga!`, 640, 310);
+    ctx.fillText(`Yig'ilgan tangalar: ${this.game.coins}`, 640, 350);
     ctx.textAlign = 'left';
 
     if (this.game.currentStage < 3) {
-      this.addButton('next_stage', 460, 415, 360, 52, "KEYINGI BOSQICH", () => {
+      this.addButton('stage_next', 460, 410, 360, 50, "KEYINGI BOSQICH >>", () => {
         this.game.startStage(this.game.currentStage + 1);
       }, '#00ffcc');
     } else {
@@ -361,23 +581,24 @@ class UIManager {
     ctx.fillRect(0, 0, 1280, 720);
 
     ctx.fillStyle = '#0f172a';
-    ctx.fillRect(480, 180, 320, 360);
+    ctx.fillRect(480, 150, 320, 420);
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2;
-    ctx.strokeRect(480, 180, 320, 360);
+    ctx.strokeRect(480, 150, 320, 420);
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = '24px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('PAUZA', 640, 240);
+    ctx.fillText('PAUZA', 640, 210);
     ctx.textAlign = 'left';
 
-    this.addButton('resume', 510, 270, 260, 48, 'DAVOM ETTIRISH', () => this.game.resumeGame(), '#00ffcc');
-    this.addButton('restart', 510, 335, 260, 48, 'QAYTA BOSHLASH', () => {
+    this.addButton('resume', 510, 240, 260, 46, 'DAVOM ETTIRISH', () => this.game.resumeGame(), '#00ffcc');
+    this.addButton('pause_quests', 510, 300, 260, 46, 'KUNLIK VAZIFALAR', () => { this.game.state = 'QUESTS'; }, '#00f0ff');
+    this.addButton('restart', 510, 360, 260, 46, 'QAYTA BOSHLASH', () => {
       if (this.game.gameMode === 'campaign') this.game.startStage(this.game.currentStage);
       else this.game.startEndlessGame();
     }, '#ffd700');
-    this.addButton('menu', 510, 400, 260, 48, 'ASOSIY MENYU', () => { this.game.state = 'MENU'; }, '#ff4444');
+    this.addButton('menu', 510, 420, 260, 46, 'ASOSIY MENYU', () => { this.game.state = 'MENU'; }, '#ff4444');
   }
 
   drawGameOver(ctx) {
@@ -407,7 +628,7 @@ class UIManager {
     ctx.fillStyle = '#ffd700';
     ctx.fillText(`Tangalar: +${this.game.coins}`, 640, 295);
     ctx.fillStyle = '#00ffcc';
-    ctx.fillText(`Maks Kombo: x${this.game.maxCombo.toFixed(1)}`, 640, 330);
+    ctx.fillText(`Maks Kombo: x${this.game.comboSys.comboMultiplier.toFixed(1)}`, 640, 330);
     ctx.fillStyle = '#8899aa';
     ctx.fillText(`Eng yaxshi: ${Math.floor(StorageManager.getHighScore())} m`, 640, 365);
     ctx.textAlign = 'left';
@@ -448,57 +669,58 @@ class UIManager {
     skins.forEach((s, idx) => {
       const cardX = 60 + idx * 236;
       const cardY = 140;
+      const cardW = 216;
+      const cardH = 430;
+      const isUnlocked = unlocked.includes(s.id);
+      const isEquipped = equipped === s.id;
 
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(cardX, cardY, 220, 430);
-      ctx.strokeStyle = equipped === s.id ? '#00ffcc' : s.color;
-      ctx.lineWidth = equipped === s.id ? 4 : 2;
-      ctx.strokeRect(cardX, cardY, 220, 430);
+      ctx.fillStyle = isEquipped ? 'rgba(10, 35, 45, 0.9)' : 'rgba(15, 23, 42, 0.85)';
+      ctx.fillRect(cardX, cardY, cardW, cardH);
+      ctx.strokeStyle = isEquipped ? '#00ffcc' : s.color;
+      ctx.lineWidth = isEquipped ? 3 : 2;
+      ctx.strokeRect(cardX, cardY, cardW, cardH);
 
       ctx.fillStyle = s.color;
-      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.font = '11px "Press Start 2P", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(s.name, cardX + 110, cardY + 35);
+      ctx.fillText(s.name, cardX + cardW / 2, cardY + 36);
 
-      ctx.fillStyle = '#1e293b';
-      ctx.fillRect(cardX + 45, cardY + 55, 130, 130);
-      
-      ctx.fillStyle = s.color;
-      ctx.fillRect(cardX + 95, cardY + 95, 30, 46);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(cardX + 110, cardY + 100, 12, 8);
+      ctx.fillStyle = '#88aacc';
+      ctx.font = '13px "Rajdhani", sans-serif';
+      ctx.fillText(s.desc, cardX + cardW / 2, cardY + 70);
 
-      ctx.fillStyle = '#8899aa';
-      ctx.font = '12px "Rajdhani", sans-serif';
-      ctx.fillText(s.desc, cardX + 110, cardY + 215);
-      ctx.fillText(`Narxi: ${s.price === 0 ? 'Bepul' : s.price + ' tanga'}`, cardX + 110, cardY + 240);
-      ctx.textAlign = 'left';
+      const previewImg = new Image();
+      previewImg.src = `assets/sprites/player/player_${s.id}_run1.png`;
+      if (previewImg.complete) {
+        ctx.drawImage(previewImg, cardX + cardW / 2 - 36, cardY + 110, 72, 108);
+      }
 
-      let btnText = 'OCHISH';
-      let btnColor = s.color;
-      let action = () => {};
+      ctx.fillStyle = '#ffd700';
+      ctx.font = '13px "Press Start 2P", monospace';
+      ctx.fillText(s.price === 0 ? 'BEPUL' : `${s.price} Tanga`, cardX + cardW / 2, cardY + 280);
 
-      if (equipped === s.id) {
-        btnText = 'TANLANGAN';
-        btnColor = '#556677';
-      } else if (unlocked.includes(s.id)) {
-        btnText = 'TANLASH';
+      let btnText = 'SOTIB OLISH';
+      let btnColor = '#ffd700';
+      let action = () => {
+        if (StorageManager.spendCoins(s.price)) {
+          StorageManager.unlockSkin(s.id);
+          StorageManager.setEquippedSkin(s.id);
+          this.game.player.updateSkin(s.id);
+          AudioSys.playSFX('powerup');
+        }
+      };
+
+      if (isEquipped) {
+        btnText = 'JIHOZLANGAN';
         btnColor = '#00ffcc';
+        action = () => {};
+      } else if (isUnlocked) {
+        btnText = 'TANLASH';
+        btnColor = '#00f0ff';
         action = () => {
           StorageManager.setEquippedSkin(s.id);
           this.game.player.updateSkin(s.id);
-        };
-      } else {
-        btnText = `OCHISH (${s.price})`;
-        const canBuy = StorageManager.getTotalCoins() >= s.price;
-        btnColor = canBuy ? '#ffd700' : '#444455';
-        action = () => {
-          if (StorageManager.spendCoins(s.price)) {
-            StorageManager.unlockSkin(s.id);
-            StorageManager.setEquippedSkin(s.id);
-            this.game.player.updateSkin(s.id);
-            AudioSys.playSFX('powerup');
-          }
+          AudioSys.playSFX('powerup');
         };
       }
 

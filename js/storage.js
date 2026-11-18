@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: LOCAL STORAGE MANAGER (v2.3)
+// PIXEL RUNNER: LOCAL STORAGE MANAGER (v3.0)
 // ==========================================
 
 const StorageManager = {
@@ -62,6 +62,7 @@ const StorageManager = {
     }
   },
 
+  // SKINS
   getUnlockedSkins() {
     const skins = localStorage.getItem('pixel_runner_skins');
     return skins ? JSON.parse(skins) : ['default'];
@@ -83,6 +84,44 @@ const StorageManager = {
     localStorage.setItem('pixel_runner_equipped', skinId);
   },
 
+  // PETS (v3.0 COMPANION PET SYSTEM)
+  getUnlockedPets() {
+    const pets = localStorage.getItem('pixel_runner_pets');
+    return pets ? JSON.parse(pets) : ['none', 'magnet_bot']; // magnet_bot is starter friendly
+  },
+
+  unlockPet(petId) {
+    const pets = this.getUnlockedPets();
+    if (!pets.includes(petId)) {
+      pets.push(petId);
+      localStorage.setItem('pixel_runner_pets', JSON.stringify(pets));
+    }
+  },
+
+  getEquippedPet() {
+    return localStorage.getItem('pixel_runner_equipped_pet') || 'magnet_bot';
+  },
+
+  setEquippedPet(petId) {
+    localStorage.setItem('pixel_runner_equipped_pet', petId);
+  },
+
+  // DAILY QUESTS (v3.0 MISSION SYSTEM)
+  getDailyQuestsData() {
+    const raw = localStorage.getItem('pixel_runner_daily_quests');
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  saveDailyQuestsData(data) {
+    localStorage.setItem('pixel_runner_daily_quests', JSON.stringify(data));
+  },
+
+  // AUDIO VOLUMES
   getMasterVolume() {
     return parseFloat(localStorage.getItem('pixel_runner_vol_master') || '0.8');
   },

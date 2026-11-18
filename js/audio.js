@@ -139,6 +139,55 @@ class AudioManager {
         osc.start(t);
         osc.stop(t + 0.04);
         break;
+
+      case 'fever_start':
+        // Epic hyper drive sweep
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, t);
+        osc.frequency.exponentialRampToValueAtTime(1400, t + 0.4);
+        gain.gain.setValueAtTime(0.4, t);
+        gain.gain.linearRampToValueAtTime(0.01, t + 0.45);
+        osc.start(t);
+        osc.stop(t + 0.45);
+        break;
+
+      case 'quest_complete':
+        // Victorious fanfare chimes
+        [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((freq, idx) => {
+          const o = this.ctx.createOscillator();
+          const g = this.ctx.createGain();
+          o.type = 'sine';
+          o.frequency.value = freq;
+          o.connect(g);
+          g.connect(this.sfxGain);
+          const st = t + idx * 0.08;
+          g.gain.setValueAtTime(0.35, st);
+          g.gain.exponentialRampToValueAtTime(0.001, st + 0.28);
+          o.start(st);
+          o.stop(st + 0.28);
+        });
+        break;
+
+      case 'thunder':
+        this.playNoise(0.7, 0.55);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(80, t);
+        osc.frequency.exponentialRampToValueAtTime(30, t + 0.6);
+        gain.gain.setValueAtTime(0.45, t);
+        gain.gain.linearRampToValueAtTime(0.01, t + 0.6);
+        osc.start(t);
+        osc.stop(t + 0.6);
+        break;
+
+      case 'pet_action':
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, t);
+        osc.frequency.exponentialRampToValueAtTime(1760, t + 0.15);
+        gain.gain.setValueAtTime(0.25, t);
+        gain.gain.linearRampToValueAtTime(0.01, t + 0.15);
+        osc.start(t);
+        osc.stop(t + 0.15);
+        break;
     }
   }
 

@@ -3,7 +3,8 @@
 // ==========================================
 
 class Player {
-  constructor() {
+  constructor(game = null) {
+    this.game = game;
     this.x = 220;
     this.y = 548;
     this.width = 36;
@@ -123,6 +124,11 @@ class Player {
       
       const jumpText = this.jumpCount === 2 ? 'DOUBLE JUMP!' : 'TRIPLE JUMP!';
       ParticleSys.addFloatingText(this.x, this.y - 25, jumpText, burstColor, 15);
+
+      if (this.game) {
+        if (this.game.comboSys) this.game.comboSys.addAction('double_jump');
+        if (this.game.dailyQuests) this.game.dailyQuests.onDoubleJump();
+      }
     }
   }
 
@@ -134,6 +140,10 @@ class Player {
         this.slideTimer = this.slideMinDuration;
         AudioSys.playSFX('slide');
         ParticleSys.addFloatingText(this.x, this.y - 15, 'SLIDE!', '#ffaa00', 13);
+        if (this.game) {
+          if (this.game.comboSys) this.game.comboSys.addAction('slide');
+          if (this.game.dailyQuests) this.game.dailyQuests.onSlide();
+        }
       }
     }
   }
@@ -158,6 +168,11 @@ class Player {
     CameraSys.addTrauma(0.4);
     ParticleSys.addShockwave(this.x, this.y + this.height / 2, '#d844ff');
     ParticleSys.addFloatingText(this.x, this.y - 20, 'GRAVITY FLIP!', '#d844ff', 15);
+    
+    if (this.game) {
+      if (this.game.comboSys) this.game.comboSys.addAction('flip');
+      if (this.game.dailyQuests) this.game.dailyQuests.onGravityFlip();
+    }
     
     this.velocityY = this.isInverted ? -360 : 360;
     this.isOnSurface = false;

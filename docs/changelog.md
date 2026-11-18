@@ -4,6 +4,28 @@ Barcha versiyalar va loyiha yangilanishlari jurnali.
 
 ---
 
+## [3.0.0] - 2026-11-18 (Feature Expansion)
+
+### Qo‘shildi (Added)
+- **Dynamic Weather & Time Cycle System (`WeatherManager.gd` / `js/weather.js`):**
+  - Vaqt sikli: Tong (Dawn), Kunduz (Day), Shom (Sunset) va Tun (Night — yulduzlar bilan).
+  - Ob-havo hodisalari: Musaffo, Kiber Yomg'ir (splash ripples), Kiber Qor va Kiber Bo'ron (chaqmoq flashelari va momaqaldiroq SFX).
+  - Ambient yorug'lik ranglari silliq o'zgaradi (60 FPS barqaror).
+- **Companion Pet System (`PetController.gd` / `js/pet.js`):**
+  - Qahramonga silliq ergashuvchi (spring lerp lag) va unga maxsus qobiliyat beruvchi kiber hamrohlar:
+    - *Magno (Magnet Bot):* 240px masofadagi tangalarni avtomatik tortadi.
+    - *Aegis (Shield Drone):* Har 60 sekundda o'yinchiga bepul qalqon hadya etadi.
+    - *Sparky (Neo Fox):* Har 75 metrda +1 bonus tanga va +30% tezroq Combo/Fever beradi.
+  - UI dagi maxsus "HAMROHLAR (PETS)" paneli orqali xarid qilish va jihozlash.
+- **Daily Quests & Mission System (`QuestManager.gd` / `js/quests.js`):**
+  - Real sana bo'yicha har kuni yangilanuvchi 3 ta dinamik vazifa (masofa, tangalar, gravitatsiya, fever).
+  - Progress shkalalari va "MUKOFOTNI OLISH (CLAIM)" tugmalari bilan interaktiv modal oyna.
+- **Combo & Fever Mode System (`ComboSystem.gd` / `js/combo.js`):**
+  - Xatolarsiz tanga yig'ish va to'siqlardan o'tish orqali Combo shkalasi to'ladi.
+  - 100% bo'lganda **FEVER HYPER DRIVE** rejimiga o'tadi: daxlsizlik, ekranda kiber tezlik chiziqlari va yig'ilgan tangalar **3x baravar** oshiriladi!
+
+---
+
 ## [2.0.0] - 2026-11-18 (Capstone Release)
 
 ### Qo‘shildi (Added)

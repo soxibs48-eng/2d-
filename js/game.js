@@ -1,6 +1,6 @@
-// ==========================================
-// PIXEL RUNNER: MAIN GAME ENGINE (v2.3 STAGED CAMPAIGN)
-// ==========================================
+// ========================================================
+// PIXEL RUNNER: MAIN GAME ENGINE (v3.0 EXTENDED EDITION)
+// ========================================================
 
 class Game {
   constructor() {
@@ -19,25 +19,24 @@ class Game {
     this.coins = 0;
     this.isNewRecord = false;
 
-    // Game Mode & Stage Progression (New Feature)
+    // Game Mode & Stage Progression
     this.gameMode = 'campaign'; // 'campaign' or 'endless'
     this.currentStage = 1;
     this.stageBonus = 0;
 
-    // Mechanics: Combo & Fever
-    this.comboMultiplier = 1.0;
-    this.maxCombo = 1.0;
-    this.feverMeter = 0;
-    this.hyperTimer = 0;
-
-    // Game state: MENU, LEVEL_SELECT, PLAYING, PAUSED, STAGE_CLEAR, GAMEOVER, SHOP, SETTINGS
+    // Game state: MENU, LEVEL_SELECT, PLAYING, PAUSED, STAGE_CLEAR, GAMEOVER, SHOP, PETS, QUESTS, SETTINGS
     this.state = 'MENU';
 
-    // Entities
-    this.player = new Player();
+    // Core Entities and Systems (v3.0)
+    this.player = new Player(this);
+    this.weatherSys = new WeatherSystem(this);
+    this.companionPet = new CompanionPet(this);
+    this.dailyQuests = new DailyQuestSystem(this);
+    this.comboSys = new ComboSystem(this);
     this.spawner = new Spawner();
     this.boss = new CyberBoss(this);
     this.ui = new UIManager(this);
+
     this.obstacles = [];
     this.pickups = [];
 
@@ -122,7 +121,6 @@ class Game {
         e.preventDefault();
         if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.player.isHyper)) {
           this.player.flipGravity();
-          this.feverMeter = Math.min(100, this.feverMeter + 8);
         }
       }
 
@@ -180,7 +178,6 @@ class Game {
         e.preventDefault();
         if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.player.isHyper)) {
           this.player.flipGravity();
-          this.feverMeter = Math.min(100, this.feverMeter + 8);
         }
       });
     }
@@ -211,62 +208,71 @@ class Game {
   startStage(stageNum) {
     this.gameMode = 'campaign';
     this.currentStage = stageNum;
-    this.startCommonGame();
+    this.resetGame();
 
-    ParticleSys.addFloatingText(640, 240, `${stageNum}-BOSQICH BOSHLANDI!`, '#00f0ff', 24);
-
-    if (stageNum === 3) {
-      // Climax Boss Stage: Boss activates after short buildup
-      setTimeout(() => {
-        if (this.state === 'PLAYING' && this.currentStage === 3) {
-          this.boss.activate();
-        }
-      }, 3500);
+    if (stageNum === 1) {
+      this.baseSpeed = 380;
+      this.spawner.minInterval = 1.6;
+      this.spawner.maxInterval = 2.4;
+      this.weatherSys.currentWeather = 'CLEAR';
+    } else if (stageNum === 2) {
+      this.baseSpeed = 440;
+      this.spawner.minInterval = 1.3;
+      this.spawner.maxInterval = 1.9;
+      this.weatherSys.currentWeather = 'RAIN';
+    } else if (stageNum === 3) {
+      this.baseSpeed = 500;
+      this.spawner.minInterval = 1.2;
+      this.spawner.maxInterval = 1.8;
+      this.weatherSys.currentWeather = 'CYBER_STORM';
     }
+
+    this.state = 'PLAYING';
+    AudioSys.startBGM();
+    AudioSys.playSFX('powerup');
+    ParticleSys.addFloatingText(640, 240, `${stageNum}-BOSQICH BOSHLANDI!`, '#00f0ff', 24);
   }
 
   startEndlessGame() {
     this.gameMode = 'endless';
     this.currentStage = 1;
-    this.startCommonGame();
-    ParticleSys.addFloatingText(640, 240, 'CHEKSIZ REJIM BOSHLANDI!', '#ffaa00', 22);
+    this.resetGame();
+    this.baseSpeed = 380;
+    this.spawner.minInterval = 1.5;
+    this.spawner.maxInterval = 2.4;
+
+    this.state = 'PLAYING';
+    AudioSys.startBGM();
+    AudioSys.playSFX('powerup');
+    ParticleSys.addFloatingText(640, 240, 'CHEKSIZ REJIM BOSHLANDI!', '#ffaa00', 24);
   }
 
-  startCommonGame() {
-    this.state = 'PLAYING';
+  resetGame() {
+    this.gameSpeed = this.baseSpeed;
     this.distance = 0;
     this.coins = 0;
-    this.gameSpeed = this.baseSpeed;
     this.isNewRecord = false;
-
-    this.comboMultiplier = 1.0;
-    this.maxCombo = 1.0;
-    this.feverMeter = 0;
-    this.hyperTimer = 0;
-
-    this.timers.magnet = 0;
-    this.timers.gravity = 0;
-    this.timers.double = 0;
-
+    this.timers = { magnet: 0, gravity: 0, double: 0 };
     this.obstacles = [];
     this.pickups = [];
-    this.boss.deactivate();
+
     this.player.reset();
+    this.companionPet.reset();
+    this.comboSys.reset();
+    this.weatherSys.reset();
     this.spawner.reset();
+    this.boss.reset();
+    CameraSys.reset();
     ParticleSys.reset();
-
-    AudioSys.startBGM();
-
-    const flipBtn = document.getElementById('touch-flip');
-    if (flipBtn) flipBtn.style.display = 'none';
   }
 
   completeCurrentStage() {
     this.state = 'STAGE_CLEAR';
-    AudioSys.playSFX('powerup');
+    AudioSys.stopBGM();
+    AudioSys.playSFX('quest_complete');
     CameraSys.addTrauma(0.5);
 
-    this.stageBonus = this.currentStage * 35;
+    this.stageBonus = this.currentStage * 120;
     StorageManager.addCoins(this.coins + this.stageBonus);
     StorageManager.saveStageStars(this.currentStage, 3);
     StorageManager.unlockStage(this.currentStage + 1);
@@ -296,15 +302,6 @@ class Game {
     StorageManager.addCoins(this.coins);
   }
 
-  triggerHyperMode() {
-    this.hyperTimer = 6.0;
-    this.player.isHyper = true;
-    AudioSys.playSFX('powerup');
-    CameraSys.addTrauma(0.4);
-    ParticleSys.addShockwave(this.player.x, this.player.y + 20, '#ff00d4');
-    ParticleSys.addFloatingText(this.player.x, 300, '★ HYPER DRIVE! ★', '#ff00d4', 24);
-  }
-
   update(delta) {
     CameraSys.update(delta);
     ParticleSys.update(delta);
@@ -316,9 +313,16 @@ class Game {
     this.bgOffsets.floor = (this.bgOffsets.floor + scrollSpeed * delta) % 256;
     this.bgOffsets.ceiling = (this.bgOffsets.ceiling + scrollSpeed * delta) % 256;
 
+    // Update Weather system in all active gameplay states
+    this.weatherSys.update(delta);
+
     if (this.state !== 'PLAYING') return;
 
-    this.distance += (this.gameSpeed * delta) / 10;
+    const frameDist = (this.gameSpeed * delta) / 10;
+    this.distance += frameDist;
+
+    // Daily Quests distance progression
+    this.dailyQuests.onDistance(frameDist);
 
     // Stage 1 & 2 Completion Check
     if (this.gameMode === 'campaign') {
@@ -329,20 +333,8 @@ class Game {
       }
     }
 
-    // Combo multiplier
-    this.comboMultiplier = Math.min(4.0, 1.0 + (this.distance / 220) * 0.2);
-    this.maxCombo = Math.max(this.maxCombo, this.comboMultiplier);
-
-    // Hyper mode timer
-    if (this.hyperTimer > 0) {
-      this.hyperTimer -= delta;
-      if (this.hyperTimer <= 0) {
-        this.player.isHyper = false;
-        this.feverMeter = 0;
-      }
-    } else {
-      this.feverMeter = Math.max(0, this.feverMeter - delta * 1.5);
-    }
+    // Update Combo & Fever System
+    this.comboSys.update(delta);
 
     this.gameSpeed = Math.min(this.baseSpeed + this.distance * this.accelerationRate, this.maxSpeed);
 
@@ -367,8 +359,11 @@ class Game {
       this.player.doubleActive = this.timers.double > 0;
     }
 
-    // Update Player & Spawner with stage context
+    // Update Player & Companion Pet
     this.player.update(delta, this.gameSpeed);
+    this.companionPet.update(delta);
+
+    // Update Spawner with stage context
     this.spawner.update(delta, this.gameSpeed, this.obstacles, this.pickups, this.currentStage, this.boss.active);
 
     // Update Boss if active
@@ -384,6 +379,8 @@ class Game {
       obs.update(delta, this.gameSpeed);
 
       if (obs.isDead) {
+        // Clean dodge bonus
+        this.comboSys.addAction('dodge');
         this.obstacles.splice(i, 1);
         continue;
       }
@@ -397,18 +394,18 @@ class Game {
       ) {
         if (obs.type === 'gravity_portal') {
           this.player.flipGravity();
-          this.feverMeter = Math.min(100, this.feverMeter + 10);
           this.obstacles.splice(i, 1);
         } else if (this.player.isHyper || this.player.isDashing) {
           ParticleSys.emitExplosion(obs.x, obs.y, '#ff00aa', 16);
           ParticleSys.addFloatingText(obs.x, obs.y, '+50 SMASH!', '#ff00aa', 16);
           this.coins += 2;
+          this.comboSys.addAction('dodge');
           this.obstacles.splice(i, 1);
           AudioSys.playSFX('hit');
         } else if (obs.damage) {
           const survived = this.player.takeDamage();
           if (survived) {
-            this.comboMultiplier = 1.0;
+            this.comboSys.comboMultiplier = 1.0;
             this.obstacles.splice(i, 1);
           } else {
             this.endGame();
@@ -430,23 +427,29 @@ class Game {
 
       if (p.checkCollision(this.player)) {
         if (p.type === 'coin') {
-          const mult = this.player.doubleActive ? 2 : 1;
-          const gained = Math.round(1 * mult * this.comboMultiplier);
-          this.coins += gained;
-          this.feverMeter = Math.min(100, this.feverMeter + 4);
-          
-          if (this.feverMeter >= 100 && this.hyperTimer <= 0) {
-            this.triggerHyperMode();
+          let gained = 1;
+          if (this.comboSys.isFeverActive) {
+            gained = 3; // 3X Coins in FEVER MODE!
+            ParticleSys.addFloatingText(p.x, p.y - 12, '+3 FEVER!', '#ff00d4', 16);
+          } else if (this.player.doubleActive) {
+            gained = 2;
+            ParticleSys.addFloatingText(p.x, p.y - 10, `+2`, '#ffd700', 14);
+          } else {
+            ParticleSys.addFloatingText(p.x, p.y - 10, `+1`, '#ffd700', 14);
           }
+
+          this.coins += gained;
+          this.comboSys.addAction('coin');
+          this.dailyQuests.onCoin();
 
           AudioSys.playSFX('coin');
           ParticleSys.emitCoinSparkle(p.x, p.y);
-          ParticleSys.addFloatingText(p.x, p.y - 10, `+${gained}`, '#ffd700', 14);
         } else if (p.type === 'emp_orb') {
           // EMP Orb collected: deals damage to the boss!
           AudioSys.playSFX('powerup');
           ParticleSys.addShockwave(p.x, p.y, '#00ff66');
           ParticleSys.addFloatingText(p.x, p.y - 20, 'EMP LAUNCHED!', '#00ff66', 16);
+          this.dailyQuests.onBossEMP();
           if (this.boss.active) {
             this.boss.takeDamage(25);
           }
@@ -482,8 +485,13 @@ class Game {
     this.ctx.save();
     CameraSys.apply(this.ctx);
 
+    // 1. Background Parallax
     this.drawParallax();
 
+    // 2. Background Weather (Stars in Night/Dawn)
+    this.weatherSys.drawBackgroundWeather(this.ctx);
+
+    // 3. Obstacles & Pickups
     for (const obs of this.obstacles) {
       obs.draw(this.ctx);
     }
@@ -491,18 +499,29 @@ class Game {
       p.draw(this.ctx);
     }
 
+    // 4. Boss
     if (this.boss.active) {
       this.boss.draw(this.ctx);
     }
 
+    // 5. Player & Companion Pet
     if (this.state === 'PLAYING' || this.state === 'PAUSED' || this.state === 'STAGE_CLEAR') {
       this.player.draw(this.ctx);
+      this.companionPet.draw(this.ctx);
     }
 
+    // 6. Particles
     ParticleSys.draw(this.ctx);
+
+    // 7. Foreground Weather (Rain, Snow, Lightning & Ambient Tint)
+    this.weatherSys.drawForegroundWeather(this.ctx);
 
     this.ctx.restore();
 
+    // 8. Screen-space Fever FX
+    this.comboSys.drawFeverEffects(this.ctx);
+
+    // 9. UI Screens and HUD
     this.ui.draw(this.ctx);
   }
 

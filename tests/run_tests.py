@@ -15,7 +15,7 @@ def test(name, condition, err_msg=""):
         failed += 1
 
 print("========================================")
-print("  PIXEL RUNNER: CI/QA TEST SUITE (v2.0) ")
+print("  PIXEL RUNNER: CI/QA TEST SUITE (v3.0) ")
 print("========================================")
 
 # 1. Check JSON Data files
@@ -73,18 +73,53 @@ core_scenes = [
     "scenes/menus/pause_menu.tscn",
     "scenes/menus/game_over_menu.tscn",
     "scenes/menus/shop_menu.tscn",
-    "scenes/menus/settings_menu.tscn"
+    "scenes/menus/settings_menu.tscn",
+    "scenes/objects/pet.tscn",
+    "scenes/world/weather.tscn"
 ]
 
 for cs in core_scenes:
-    test(f"Core scene exists: {cs}", os.path.exists(cs))
+    test(f"Scene exists: {cs}", os.path.exists(cs))
 
-# 4. Check Documentation
+# 4. Check Web Scripts (v3.0)
+web_scripts = [
+    "js/audio.js",
+    "js/storage.js",
+    "js/particles.js",
+    "js/weather.js",
+    "js/pet.js",
+    "js/quests.js",
+    "js/combo.js",
+    "js/player.js",
+    "js/obstacles.js",
+    "js/pickups.js",
+    "js/spawner.js",
+    "js/camera.js",
+    "js/boss.js",
+    "js/ui.js",
+    "js/game.js"
+]
+
+for ws in web_scripts:
+    test(f"Web script exists: {ws}", os.path.exists(ws))
+
+# 5. Check Godot 4 Scripts (v3.0)
+godot_scripts = [
+    "scripts/world/weather_manager.gd",
+    "scripts/gameplay/pet_controller.gd",
+    "scripts/managers/quest_manager.gd",
+    "scripts/systems/combo_system.gd"
+]
+
+for gs in godot_scripts:
+    test(f"Godot script exists: {gs}", os.path.exists(gs))
+
+# 6. Check Documentation
 docs = ["README.md", "docs/GDD.md", "docs/controls.md", "docs/changelog.md"]
 for d in docs:
     test(f"Documentation exists: {d}", os.path.exists(d))
 
-# 5. Check Export Presets
+# 7. Check Export Presets
 test("Export presets exists", os.path.exists("export_presets.cfg") or os.path.exists("export/export_presets.cfg"))
 
 print("========================================")

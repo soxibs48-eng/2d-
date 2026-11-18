@@ -65,6 +65,21 @@ class ParticleSystem {
     });
   }
 
+  // Rain water ripple
+  addRipple(x, y, color = '#00f0ff') {
+    if (this.shockwaves.length < 25) {
+      this.shockwaves.push({
+        x: x,
+        y: y,
+        radius: 2,
+        maxRadius: 18,
+        color: color,
+        alpha: 0.6,
+        speed: 45
+      });
+    }
+  }
+
   // Coin sparkle & popups
   emitCoinSparkle(x, y) {
     for (let i = 0; i < 12; i++) {
