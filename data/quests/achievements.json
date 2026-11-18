@@ -1,0 +1,32 @@
+{
+  "achievements": [
+    {
+      "id": "first_run",
+      "name": "Boshlang'ich Yuguruvchi",
+      "desc": "Ilk marotaba yugurishni boshlang.",
+      "target": 1,
+      "type": "runs"
+    },
+    {
+      "id": "runner_500",
+      "name": "500 Metr Marrasi",
+      "desc": "Bir o'yinda 500 metr masofani bosib o'ting.",
+      "target": 500,
+      "type": "distance"
+    },
+    {
+      "id": "coins_50",
+      "name": "Tanga Ishqibozi",
+      "desc": "Jami 50 ta oltin tanga to'plang.",
+      "target": 50,
+      "type": "coins"
+    },
+    {
+      "id": "gravity_flipper",
+      "name": "Gravitatsiya Ustasi",
+      "desc": "O'yinda 5 marta gravitatsiyani almashtiring.",
+      "target": 5,
+      "type": "flips"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/parallax_bg.gd" id="1_bg_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/sky.png" id="2_sky"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/buildings_far.png" id="3_bfar"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/buildings_mid.png" id="4_bmid"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/floor.png" id="5_floor"]
+[ext_resource type="Texture2D" path="res://assets/sprites/background/ceiling.png" id="6_ceiling"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="7_player"]
+[ext_resource type="Script" path="res://scripts/world/obstacle_spawner.gd" id="8_spawner"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(2000, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ceiling"]
+size = Vector2(2000, 80)
+
+[node name="World" type="Node2D"]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+script = ExtResource("1_bg_script")
+
+[node name="SkyLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.1, 0)
+motion_mirroring = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/SkyLayer"]
+scale = Vector2(2, 2)
+texture = ExtResource("2_sky")
+centered = false
+
+[node name="FarBuildingsLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.3, 0)
+motion_mirroring = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/FarBuildingsLayer"]
+scale = Vector2(2, 2)
+texture = ExtResource("3_bfar")
+centered = false
+
+[node name="MidBuildingsLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.6, 0)
+motion_mirroring = Vector2(1280, 0)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/MidBuildingsLayer"]
+scale = Vector2(2, 2)
+texture = ExtResource("4_bmid")
+centered = false
+
+[node name="FloorTrackLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(1, 0)
+motion_mirroring = Vector2(1280, 0)
+
+[node name="Tile1" type="Sprite2D" parent="ParallaxBackground/FloorTrackLayer"]
+position = Vector2(0, 580)
+scale = Vector2(2, 2)
+texture = ExtResource("5_floor")
+centered = false
+
+[node name="Tile2" type="Sprite2D" parent="ParallaxBackground/FloorTrackLayer"]
+position = Vector2(256, 580)
+scale = Vector2(2, 2)
+texture = ExtResource("5_floor")
+centered = false
+
+[node name="Tile3" type="Sprite2D" parent="ParallaxBackground/FloorTrackLayer"]
+position = Vector2(512, 580)
+scale = Vector2(2, 2)
+texture = ExtResource("5_floor")
+centered = false
+
+[node name="Tile4" type="Sprite2D" parent="ParallaxBackground/FloorTrackLayer"]
+position = Vector2(768, 580)
+scale = Vector2(2, 2)
+texture = ExtResource("5_floor")
+centered = false
+
+[node name="Tile5" type="Sprite2D" parent="ParallaxBackground/FloorTrackLayer"]
+position = Vector2(1024, 580)
+scale = Vector2(2, 2)
+texture = ExtResource("5_floor")
+centered = false
+
+[node name="CeilingTrackLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(1, 0)
+motion_mirroring = Vector2(1280, 0)
+
+[node name="Tile1" type="Sprite2D" parent="ParallaxBackground/CeilingTrackLayer"]
+position = Vector2(0, 76)
+scale = Vector2(2, 2)
+texture = ExtResource("6_ceiling")
+centered = false
+
+[node name="Tile2" type="Sprite2D" parent="ParallaxBackground/CeilingTrackLayer"]
+position = Vector2(256, 76)
+scale = Vector2(2, 2)
+texture = ExtResource("6_ceiling")
+centered = false
+
+[node name="Tile3" type="Sprite2D" parent="ParallaxBackground/CeilingTrackLayer"]
+position = Vector2(512, 76)
+scale = Vector2(2, 2)
+texture = ExtResource("6_ceiling")
+centered = false
+
+[node name="Tile4" type="Sprite2D" parent="ParallaxBackground/CeilingTrackLayer"]
+position = Vector2(768, 76)
+scale = Vector2(2, 2)
+texture = ExtResource("6_ceiling")
+centered = false
+
+[node name="Tile5" type="Sprite2D" parent="ParallaxBackground/CeilingTrackLayer"]
+position = Vector2(1024, 76)
+scale = Vector2(2, 2)
+texture = ExtResource("6_ceiling")
+centered = false
+
+[node name="FloorStatic" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="FloorStatic"]
+position = Vector2(640, 620)
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="CeilingStatic" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CeilingStatic"]
+position = Vector2(640, 100)
+shape = SubResource("RectangleShape2D_ceiling")
+
+[node name="Player" parent="." instance=ExtResource("7_player")]
+position = Vector2(220, 550)
+
+[node name="ObstacleSpawner" type="Node2D" parent="."]
+script = ExtResource("8_spawner")

@@ -1,0 +1,207 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/shop_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/icon_coin.png" id="2_coin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/player_default_run1.png" id="3_default_skin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/player_ninja_run1.png" id="4_ninja_skin"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player/player_mech_run1.png" id="5_mech_skin"]
+
+[node name="ShopMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.04, 0.08, 0.88)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(720, 520)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -260.0
+offset_right = 360.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="TopBar" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 32
+text = "MAGAZIN - QAHRAMON SKINLARI"
+
+[node name="Spacer" type="Control" parent="PanelContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CoinsBox" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="PanelContainer/VBoxContainer/TopBar/CoinsBox"]
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+texture = ExtResource("2_coin")
+stretch_mode = 5
+
+[node name="TotalCoinsLabel" type="Label" parent="PanelContainer/VBoxContainer/TopBar/CoinsBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "0"
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SkinsScroll" type="ScrollContainer" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 320)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/SkinsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 25
+alignment = 1
+
+[node name="SkinDefault" type="PanelContainer" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer"]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinDefault"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Name" type="Label" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinDefault/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "CYBER RUNNER"
+horizontal_alignment = 1
+
+[node name="Preview" type="TextureRect" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinDefault/VBox"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+texture = ExtResource("3_default_skin")
+stretch_mode = 5
+
+[node name="Desc" type="Label" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinDefault/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Klassik kiber yuguruvchi.
+Bepul"
+horizontal_alignment = 1
+
+[node name="ActionBtn" type="Button" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinDefault/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+focus_mode = 0
+text = "TANLANGAN"
+
+[node name="SkinNinja" type="PanelContainer" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer"]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinNinja"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Name" type="Label" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinNinja/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "NEON NINJA"
+horizontal_alignment = 1
+
+[node name="Preview" type="TextureRect" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinNinja/VBox"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+texture = ExtResource("4_ninja_skin")
+stretch_mode = 5
+
+[node name="Desc" type="Label" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinNinja/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Tungi neon soyasi.
+Narxi: 50 tanga"
+horizontal_alignment = 1
+
+[node name="ActionBtn" type="Button" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinNinja/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+focus_mode = 0
+text = "OCHISH (50)"
+
+[node name="SkinMech" type="PanelContainer" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer"]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinMech"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Name" type="Label" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinMech/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0, 1)
+theme_override_font_sizes/font_size = 18
+text = "GOLDEN MECH"
+horizontal_alignment = 1
+
+[node name="Preview" type="TextureRect" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinMech/VBox"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+texture = ExtResource("5_mech_skin")
+stretch_mode = 5
+
+[node name="Desc" type="Label" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinMech/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Oltin zirhli robot.
+Narxi: 100 tanga"
+horizontal_alignment = 1
+
+[node name="ActionBtn" type="Button" parent="PanelContainer/VBoxContainer/SkinsScroll/HBoxContainer/SkinMech/VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+focus_mode = 0
+text = "OCHISH (100)"
+
+[node name="BottomBar" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="BackBtn" type="Button" parent="PanelContainer/VBoxContainer/BottomBar"]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "ORTGA"

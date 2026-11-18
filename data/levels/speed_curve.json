@@ -1,0 +1,8 @@
+{
+  "base_speed": 380.0,
+  "acceleration_rate": 0.04,
+  "max_speed": 950.0,
+  "speed_formula": "base_speed + (distance * acceleration_rate)",
+  "spawn_gap_min": 480.0,
+  "spawn_gap_max": 720.0
+}

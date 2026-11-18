@@ -1,0 +1,54 @@
+{
+  "skins": [
+    {
+      "id": "default",
+      "name": "CYBER RUNNER",
+      "price": 0,
+      "description": "Klassik kiber yuguruvchi. Har bir yuguruvchining asosiy kiyimi.",
+      "unlocked": true,
+      "color": "#00f0ff"
+    },
+    {
+      "id": "ninja",
+      "name": "NEON NINJA",
+      "price": 50,
+      "description": "Tungi neon soyasi. Yuqori chaqqonlik va zamonaviy uslub.",
+      "unlocked": false,
+      "color": "#ff1e8c"
+    },
+    {
+      "id": "mech",
+      "name": "GOLDEN MECH",
+      "price": 100,
+      "description": "Oltin zirhli reaktiv robot. Maksimal quvvat va himoya ramzi.",
+      "unlocked": false,
+      "color": "#ffd700"
+    }
+  ],
+  "powerups": [
+    {
+      "id": "shield",
+      "name": "Energy Shield",
+      "duration": 0,
+      "description": "To'qnashuvdan 1 martalik mutlaq himoya qalqoni."
+    },
+    {
+      "id": "magnet",
+      "name": "Coin Magnet",
+      "duration": 8.0,
+      "description": "Atrofdagi barcha tangalarni avtomatik o'ziga tortadi."
+    },
+    {
+      "id": "gravity",
+      "name": "Gravity Core",
+      "duration": 10.0,
+      "description": "Ixtiyoriy vaqtda gravitatsiyani teskariga o'zgartirish quvvati."
+    },
+    {
+      "id": "double",
+      "name": "Double Multiplier",
+      "duration": 10.0,
+      "description": "Yig'ilgan barcha tangalarni 2 baravarga ko'paytiradi."
+    }
+  ]
+}

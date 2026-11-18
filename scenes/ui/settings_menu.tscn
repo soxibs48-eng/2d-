@@ -1,0 +1,120 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/settings_menu.gd" id="1_script"]
+
+[node name="SettingsMenu" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="DimOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.04, 0.08, 0.85)
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(440, 420)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -210.0
+offset_right = 220.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Title" type="Label" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.94, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "SOZLAMALAR"
+horizontal_alignment = 1
+
+[node name="Sliders" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="MasterBox" type="HBoxContainer" parent="PanelContainer/VBoxContainer/Sliders"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/Sliders/MasterBox"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Umumiy Ovoz:"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/Sliders/MasterBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="MusicBox" type="HBoxContainer" parent="PanelContainer/VBoxContainer/Sliders"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/Sliders/MusicBox"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Musiqa (BGM):"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/Sliders/MusicBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+value = 0.7
+
+[node name="SfxBox" type="HBoxContainer" parent="PanelContainer/VBoxContainer/Sliders"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/Sliders/SfxBox"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "Effektlar (SFX):"
+
+[node name="HSlider" type="HSlider" parent="PanelContainer/VBoxContainer/Sliders/SfxBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.05
+value = 0.9
+
+[node name="FullscreenBox" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/FullscreenBox"]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "To'liq Ekran:"
+
+[node name="CheckBox" type="CheckBox" parent="PanelContainer/VBoxContainer/FullscreenBox"]
+layout_mode = 2
+focus_mode = 0
+
+[node name="BackBtn" type="Button" parent="PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 18
+text = "ORTGA"

@@ -1,0 +1,39 @@
+{
+  "hazards": [
+    {
+      "id": "spike_floor",
+      "name": "Floor Spikes",
+      "type": "ground",
+      "damage": 1,
+      "spawn_weight": 35
+    },
+    {
+      "id": "spike_ceiling",
+      "name": "Ceiling Spikes",
+      "type": "ceiling",
+      "damage": 1,
+      "spawn_weight": 30
+    },
+    {
+      "id": "laser_barrier",
+      "name": "Laser Barrier",
+      "type": "vertical",
+      "damage": 1,
+      "spawn_weight": 15
+    },
+    {
+      "id": "floating_mine",
+      "name": "Floating Cyber Mine",
+      "type": "aerial",
+      "damage": 1,
+      "spawn_weight": 12
+    },
+    {
+      "id": "gravity_portal",
+      "name": "Anti-Gravity Portal",
+      "type": "portal",
+      "damage": 0,
+      "spawn_weight": 8
+    }
+  ]
+}
