@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: OBSTACLES & HAZARDS
+// PIXEL RUNNER: OBSTACLES & HAZARDS (v2.1 OVERHAUL)
 // ==========================================
 
 class Obstacle {
@@ -8,10 +8,11 @@ class Obstacle {
     this.x = x;
     this.y = y;
     this.initialY = y;
-    this.time = 0;
+    this.time = Math.random() * 5;
+    this.rotation = 0;
     this.isDead = false;
 
-    // Dimensions and hitboxes
+    // Dimensions & Hitboxes
     switch (type) {
       case 'spike_floor':
         this.width = 56;
@@ -34,15 +35,22 @@ class Obstacle {
         this.damage = true;
         this.bobbing = true;
         break;
+      case 'laser_saw': // New spinning neon hazard
+        this.width = 54;
+        this.height = 54;
+        this.damage = true;
+        this.rotating = true;
+        break;
       case 'gravity_portal':
         this.width = 40;
         this.height = 120;
-        this.damage = false; // Triggers gravity flip!
+        this.damage = false;
         break;
     }
 
     this.sprite = new Image();
-    this.sprite.src = `assets/sprites/obstacles/${type}.png`;
+    const spritePath = type === 'laser_saw' ? 'floating_mine' : type;
+    this.sprite.src = `assets/sprites/obstacles/${spritePath}.png`;
   }
 
   update(delta, gameSpeed) {
@@ -51,6 +59,10 @@ class Obstacle {
 
     if (this.bobbing) {
       this.y = this.initialY + Math.sin(this.time * 3.0) * 25;
+    }
+
+    if (this.rotating) {
+      this.rotation += 8.0 * delta;
     }
 
     if (this.x < -150) {
@@ -71,7 +83,31 @@ class Obstacle {
     ctx.save();
     ctx.translate(this.x, this.y);
 
-    if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
+    if (this.type === 'laser_saw') {
+      // Custom procedural high-tech spinning saw
+      ctx.rotate(this.rotation);
+      ctx.strokeStyle = '#ff0055';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, 24, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Saw teeth
+      ctx.fillStyle = '#ff3366';
+      for (let i = 0; i < 8; i++) {
+        const a = (Math.PI / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 20, Math.sin(a) * 20);
+        ctx.lineTo(Math.cos(a + 0.2) * 30, Math.sin(a + 0.2) * 30);
+        ctx.lineTo(Math.cos(a + 0.4) * 20, Math.sin(a + 0.4) * 20);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(0, 0, 8, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (this.sprite && this.sprite.complete && this.sprite.naturalWidth > 0) {
       const renderW = this.type === 'laser_barrier' || this.type === 'gravity_portal' ? 64 : 64;
       const renderH = this.type === 'laser_barrier' || this.type === 'gravity_portal' ? 128 : 64;
       ctx.drawImage(this.sprite, -renderW / 2, -renderH / 2, renderW, renderH);

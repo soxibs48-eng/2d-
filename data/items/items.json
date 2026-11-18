@@ -23,6 +23,22 @@
       "description": "Oltin zirhli reaktiv robot. Maksimal quvvat va himoya ramzi.",
       "unlocked": false,
       "color": "#ffd700"
+    },
+    {
+      "id": "valkyrie",
+      "name": "CYBER PHANTOM",
+      "price": 150,
+      "description": "Tezkor zumrad kiber sharpa. Qisqa dash bilan havoda o'tish.",
+      "unlocked": false,
+      "color": "#00ffcc"
+    },
+    {
+      "id": "synthwave",
+      "name": "SYNTHWAVE OVERLORD",
+      "price": 250,
+      "description": "Retro synthwave hukmdori. Oltin toj va neon energiya nuri.",
+      "unlocked": false,
+      "color": "#b030ff"
     }
   ],
   "powerups": [
@@ -49,6 +65,15 @@
       "name": "Double Multiplier",
       "duration": 10.0,
       "description": "Yig'ilgan barcha tangalarni 2 baravarga ko'paytiradi."
+    }
+  ],
+  "abilities": [
+    {
+      "id": "cyber_dash",
+      "name": "Cyber Dash",
+      "key": "E",
+      "cooldown": 3.5,
+      "description": "To'siqlarni yorib o'tuvchi tezkor oldinga teleportatsiya/dash zarbasi."
     }
   ]
 }

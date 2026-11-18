@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: PLAYER CONTROLLER
+// PIXEL RUNNER: PLAYER CONTROLLER (v2.1 OVERHAUL)
 // ==========================================
 
 class Player {
@@ -24,15 +24,24 @@ class Player {
     this.animTimer = 0;
     this.runFrame = 1;
     
+    // Power-ups
     this.hasShield = false;
     this.magnetActive = false;
     this.doubleActive = false;
     this.gravityActive = false;
+    this.isHyper = false; // Fever / Hyper mode!
     
-    this.magnetRadius = 260;
+    // Dash Ability (New Feature)
+    this.isDashing = false;
+    this.dashTimer = 0;
+    this.dashDuration = 0.22;
+    this.dashCooldown = 0;
+    this.dashCooldownMax = 3.5;
+    this.afterimages = [];
+    
+    this.magnetRadius = 280;
     this.skin = StorageManager.getEquippedSkin();
     
-    // Floor and Ceiling bounds
     this.floorY = 580;
     this.ceilingY = 140;
     
@@ -69,6 +78,11 @@ class Player {
     this.magnetActive = false;
     this.doubleActive = false;
     this.gravityActive = false;
+    this.isHyper = false;
+    this.isDashing = false;
+    this.dashTimer = 0;
+    this.dashCooldown = 0;
+    this.afterimages = [];
     this.skin = StorageManager.getEquippedSkin();
     this.loadSprites();
   }
@@ -79,6 +93,9 @@ class Player {
       this.isOnSurface = false;
       this.isSliding = false;
       AudioSys.playSFX('jump');
+      
+      const footY = this.isInverted ? this.ceilingY : this.floorY;
+      ParticleSys.emitJumpBurst(this.x, footY, this.getAccentColor(), this.isInverted);
     }
   }
 
@@ -105,24 +122,80 @@ class Player {
   flipGravity() {
     this.isInverted = !this.isInverted;
     AudioSys.playSFX('gravity_flip');
-    CameraSys.addTrauma(0.35);
+    CameraSys.addTrauma(0.4);
+    ParticleSys.addShockwave(this.x, this.y + this.height / 2, '#d844ff');
+    ParticleSys.addFloatingText(this.x, this.y - 20, 'GRAVITY FLIP!', '#d844ff', 14);
+    
     this.velocityY = this.isInverted ? -350 : 350;
     this.isOnSurface = false;
   }
 
+  dash() {
+    if (this.dashCooldown <= 0 && !this.isDashing) {
+      this.isDashing = true;
+      this.dashTimer = this.dashDuration;
+      this.dashCooldown = this.dashCooldownMax;
+      
+      AudioSys.playSFX('powerup');
+      CameraSys.addTrauma(0.35);
+      ParticleSys.addShockwave(this.x, this.y + this.height / 2, '#00ffff');
+      ParticleSys.addFloatingText(this.x, this.y - 30, 'CYBER DASH!', '#00ffff', 16);
+    }
+  }
+
+  getAccentColor() {
+    switch (this.skin) {
+      case 'ninja': return '#ff1e8c';
+      case 'mech': return '#ffd700';
+      case 'valkyrie': return '#00ffcc';
+      case 'synthwave': return '#b030ff';
+      default: return '#00f0ff';
+    }
+  }
+
   update(delta, gameSpeed) {
-    // Current gravity force
+    // Dash cooldown
+    if (this.dashCooldown > 0) {
+      this.dashCooldown = Math.max(0, this.dashCooldown - delta);
+    }
+
+    // Dash execution
+    if (this.isDashing) {
+      this.dashTimer -= delta;
+      // Record afterimages
+      this.afterimages.push({
+        x: this.x,
+        y: this.y,
+        alpha: 0.8,
+        isInverted: this.isInverted,
+        isSliding: this.isSliding
+      });
+      if (this.dashTimer <= 0) {
+        this.isDashing = false;
+      }
+    }
+
+    // Update afterimages
+    for (let i = this.afterimages.length - 1; i >= 0; i--) {
+      this.afterimages[i].alpha -= delta * 5;
+      if (this.afterimages[i].alpha <= 0) {
+        this.afterimages.splice(i, 1);
+      }
+    }
+
+    // Gravity calculation
     const currentGravity = this.isInverted ? -this.normalGravity : this.normalGravity;
 
-    // Apply gravity
-    if (!this.isOnSurface) {
+    if (!this.isOnSurface && !this.isDashing) {
       this.velocityY += currentGravity * delta;
       this.velocityY = Math.max(-1200, Math.min(1200, this.velocityY));
     }
 
-    this.y += this.velocityY * delta;
+    if (!this.isDashing) {
+      this.y += this.velocityY * delta;
+    }
 
-    // Floor and Ceiling collision resolution
+    // Surface bounds
     if (!this.isInverted) {
       const currentH = this.isSliding ? 26 : this.height;
       if (this.y + currentH >= this.floorY) {
@@ -150,7 +223,14 @@ class Player {
       }
     }
 
-    // Animation frame progression
+    // Run particles
+    if (this.isOnSurface) {
+      const trailY = this.isInverted ? this.ceilingY + 4 : this.floorY - 4;
+      const trailColor = this.isHyper ? '#ff00d4' : this.getAccentColor();
+      ParticleSys.emitJetTrail(this.x - 14, trailY, trailColor, this.isSliding ? 3 : 1);
+    }
+
+    // Animation frames
     if (this.isOnSurface && !this.isSliding) {
       this.animTimer += delta * (gameSpeed / 40);
       if (this.animTimer >= 1.0) {
@@ -178,26 +258,46 @@ class Player {
   }
 
   takeDamage() {
+    if (this.isDashing || this.isHyper) {
+      // Invulnerable during dash and hyper mode!
+      return true;
+    }
+
     if (this.hasShield) {
       this.hasShield = false;
       AudioSys.playSFX('shield_break');
-      CameraSys.addTrauma(0.5);
-      return true; // Survived
+      CameraSys.addTrauma(0.55);
+      ParticleSys.emitExplosion(this.x, this.y + this.height / 2, '#00f0ff', 20);
+      ParticleSys.addFloatingText(this.x, this.y - 20, 'SHIELD BROKE!', '#00f0ff', 14);
+      return true;
     }
-    return false; // Fatal
+    return false;
   }
 
   draw(ctx) {
+    // 1. Draw Dash Afterimages
+    for (const ghost of this.afterimages) {
+      ctx.save();
+      ctx.globalAlpha = ghost.alpha * 0.45;
+      ctx.translate(ghost.x, ghost.y + (ghost.isInverted ? 0 : this.height / 2));
+      if (ghost.isInverted) {
+        ctx.scale(1, -1);
+        ctx.translate(0, -this.height / 2);
+      }
+      ctx.fillStyle = '#00ffff';
+      ctx.fillRect(-16, -24, 32, 48);
+      ctx.restore();
+    }
+
+    // 2. Draw Main Player
     ctx.save();
     ctx.translate(this.x, this.y + (this.isInverted ? 0 : this.height / 2));
 
-    // Vertical flip for ceiling running
     if (this.isInverted) {
       ctx.scale(1, -1);
       ctx.translate(0, -this.height / 2);
     }
 
-    // Pick sprite pose
     let pose = 'run1';
     if (this.isSliding) {
       pose = 'slide';
@@ -209,16 +309,20 @@ class Player {
 
     const sprite = this.sprites[pose];
     if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+      // Glow filter if in Hyper mode
+      if (this.isHyper) {
+        ctx.shadowColor = '#ff00ff';
+        ctx.shadowBlur = 15;
+      }
       ctx.drawImage(sprite, -32, -32, 64, 64);
     } else {
-      // Procedural pixel-art fallback
-      ctx.fillStyle = this.skin === 'mech' ? '#ffd700' : (this.skin === 'ninja' ? '#ff1e8c' : '#00f0ff');
+      ctx.fillStyle = this.getAccentColor();
       if (this.isSliding) {
         ctx.fillRect(-24, 0, 48, 24);
       } else {
         ctx.fillRect(-16, -24, 32, 48);
         ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, -18, 12, 8); // Visor
+        ctx.fillRect(0, -18, 12, 8);
       }
     }
 

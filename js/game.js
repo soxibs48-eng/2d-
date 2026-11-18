@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: MAIN GAME ENGINE
+// PIXEL RUNNER: MAIN GAME ENGINE (v2.1 OVERHAUL)
 // ==========================================
 
 class Game {
@@ -7,18 +7,23 @@ class Game {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
     
-    // Virtual resolution
     this.width = 1280;
     this.height = 720;
 
-    // Difficulty curve parameters from TZ
+    // Difficulty curve parameters
     this.baseSpeed = 380;
     this.accelerationRate = 0.04;
-    this.maxSpeed = 950;
+    this.maxSpeed = 980;
     this.gameSpeed = 380;
     this.distance = 0;
     this.coins = 0;
     this.isNewRecord = false;
+
+    // New Mechanics: Combo & Fever
+    this.comboMultiplier = 1.0;
+    this.maxCombo = 1.0;
+    this.feverMeter = 0;
+    this.hyperTimer = 0;
 
     // Game state: MENU, PLAYING, PAUSED, GAMEOVER, SHOP, SETTINGS
     this.state = 'MENU';
@@ -71,7 +76,6 @@ class Game {
 
   bindInputs() {
     window.addEventListener('keydown', (e) => {
-      // Audio unlock on user interaction
       AudioSys.init();
       AudioSys.resume();
 
@@ -95,10 +99,20 @@ class Game {
         }
       }
 
+      // Dash Ability (Key E)
+      if (e.code === 'KeyE') {
+        e.preventDefault();
+        if (this.state === 'PLAYING') {
+          this.player.dash();
+        }
+      }
+
+      // Flip Gravity (Shift or F)
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyF') {
         e.preventDefault();
-        if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.state === 'TEST')) {
+        if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.player.isHyper)) {
           this.player.flipGravity();
+          this.feverMeter = Math.min(100, this.feverMeter + 8);
         }
       }
 
@@ -116,6 +130,7 @@ class Game {
     const jumpBtn = document.getElementById('touch-jump');
     const slideBtn = document.getElementById('touch-slide');
     const flipBtn = document.getElementById('touch-flip');
+    const dashBtn = document.getElementById('touch-dash');
 
     if (jumpBtn) {
       jumpBtn.addEventListener('touchstart', (e) => {
@@ -133,16 +148,24 @@ class Game {
       });
     }
 
+    if (dashBtn) {
+      dashBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (this.state === 'PLAYING') this.player.dash();
+      });
+    }
+
     if (flipBtn) {
       flipBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        if (this.state === 'PLAYING' && this.timers.gravity > 0) {
+        if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.player.isHyper)) {
           this.player.flipGravity();
+          this.feverMeter = Math.min(100, this.feverMeter + 8);
         }
       });
     }
 
-    // Mouse click handling for canvas UI
+    // Canvas click & mouse position
     const getCanvasPos = (evt) => {
       const rect = this.canvas.getBoundingClientRect();
       const scaleX = this.canvas.width / rect.width;
@@ -173,6 +196,11 @@ class Game {
     this.gameSpeed = this.baseSpeed;
     this.isNewRecord = false;
 
+    this.comboMultiplier = 1.0;
+    this.maxCombo = 1.0;
+    this.feverMeter = 0;
+    this.hyperTimer = 0;
+
     this.timers.magnet = 0;
     this.timers.gravity = 0;
     this.timers.double = 0;
@@ -181,6 +209,7 @@ class Game {
     this.pickups = [];
     this.player.reset();
     this.spawner.reset();
+    ParticleSys.reset();
 
     AudioSys.startBGM();
 
@@ -202,16 +231,27 @@ class Game {
     this.state = 'GAMEOVER';
     AudioSys.stopBGM();
     AudioSys.playSFX('hit');
-    CameraSys.addTrauma(0.8);
+    CameraSys.addTrauma(0.85);
 
+    ParticleSys.emitExplosion(this.player.x, this.player.y + 20, '#ff2255', 30);
     this.isNewRecord = StorageManager.saveHighScore(this.distance);
     StorageManager.addCoins(this.coins);
   }
 
+  triggerHyperMode() {
+    this.hyperTimer = 6.0;
+    this.player.isHyper = true;
+    AudioSys.playSFX('powerup');
+    CameraSys.addTrauma(0.4);
+    ParticleSys.addShockwave(this.player.x, this.player.y + 20, '#ff00d4');
+    ParticleSys.addFloatingText(this.player.x, 300, '★ HYPER DRIVE! ★', '#ff00d4', 24);
+  }
+
   update(delta) {
     CameraSys.update(delta);
+    ParticleSys.update(delta);
 
-    // Parallax background always scrolls for dynamic ambience
+    // Parallax background scrolling
     const scrollSpeed = this.state === 'PLAYING' ? this.gameSpeed : 80;
     this.bgOffsets.sky = (this.bgOffsets.sky + scrollSpeed * 0.1 * delta) % 1280;
     this.bgOffsets.far = (this.bgOffsets.far + scrollSpeed * 0.3 * delta) % 1280;
@@ -224,20 +264,41 @@ class Game {
     // Progress distance
     this.distance += (this.gameSpeed * delta) / 10;
 
-    // Dynamic speed scaling from TZ formula
+    // Combo multiplier slowly ramps up during clean run
+    this.comboMultiplier = Math.min(4.0, 1.0 + (this.distance / 250) * 0.2);
+    this.maxCombo = Math.max(this.maxCombo, this.comboMultiplier);
+
+    // Hyper mode timer
+    if (this.hyperTimer > 0) {
+      this.hyperTimer -= delta;
+      if (this.hyperTimer <= 0) {
+        this.player.isHyper = false;
+        this.feverMeter = 0;
+      }
+    } else {
+      // Natural slow decay of fever
+      this.feverMeter = Math.max(0, this.feverMeter - delta * 1.5);
+    }
+
+    // Dynamic speed formula
     this.gameSpeed = Math.min(this.baseSpeed + this.distance * this.accelerationRate, this.maxSpeed);
 
     // Power-up timers
     if (this.timers.magnet > 0) {
       this.timers.magnet = Math.max(0, this.timers.magnet - delta);
-      this.player.magnetActive = this.timers.magnet > 0;
+      this.player.magnetActive = this.timers.magnet > 0 || this.player.isHyper;
+    } else {
+      this.player.magnetActive = this.player.isHyper;
     }
+
     if (this.timers.gravity > 0) {
       this.timers.gravity = Math.max(0, this.timers.gravity - delta);
-      this.player.gravityActive = this.timers.gravity > 0;
-      const flipBtn = document.getElementById('touch-flip');
-      if (flipBtn) flipBtn.style.display = this.timers.gravity > 0 ? 'block' : 'none';
+      this.player.gravityActive = this.timers.gravity > 0 || this.player.isHyper;
     }
+
+    const flipBtn = document.getElementById('touch-flip');
+    if (flipBtn) flipBtn.style.display = (this.timers.gravity > 0 || this.player.isHyper) ? 'block' : 'none';
+
     if (this.timers.double > 0) {
       this.timers.double = Math.max(0, this.timers.double - delta);
       this.player.doubleActive = this.timers.double > 0;
@@ -249,7 +310,7 @@ class Game {
     // Spawner update
     this.spawner.update(delta, this.gameSpeed, this.obstacles, this.pickups);
 
-    // Obstacles update & collision
+    // Obstacles collision
     const pHitbox = this.player.getHitbox();
 
     for (let i = this.obstacles.length - 1; i >= 0; i--) {
@@ -261,7 +322,6 @@ class Game {
         continue;
       }
 
-      // Check collision
       const oHitbox = obs.getHitbox();
       if (
         pHitbox.x < oHitbox.x + oHitbox.width &&
@@ -270,12 +330,20 @@ class Game {
         pHitbox.y + pHitbox.height > oHitbox.y
       ) {
         if (obs.type === 'gravity_portal') {
-          // Flip gravity safely!
           this.player.flipGravity();
+          this.feverMeter = Math.min(100, this.feverMeter + 10);
           this.obstacles.splice(i, 1);
+        } else if (this.player.isHyper || this.player.isDashing) {
+          // Smash obstacle during hyper or dash!
+          ParticleSys.emitExplosion(obs.x, obs.y, '#ff00aa', 16);
+          ParticleSys.addFloatingText(obs.x, obs.y, '+50 SMASH!', '#ff00aa', 16);
+          this.coins += 2;
+          this.obstacles.splice(i, 1);
+          AudioSys.playSFX('hit');
         } else if (obs.damage) {
           const survived = this.player.takeDamage();
           if (survived) {
+            this.comboMultiplier = 1.0; // Combo reset on hit
             this.obstacles.splice(i, 1);
           } else {
             this.endGame();
@@ -285,7 +353,7 @@ class Game {
       }
     }
 
-    // Pickups update & collection
+    // Pickups collision
     for (let i = this.pickups.length - 1; i >= 0; i--) {
       const p = this.pickups[i];
       p.update(delta, this.gameSpeed, this.player);
@@ -298,23 +366,36 @@ class Game {
       if (p.checkCollision(this.player)) {
         if (p.type === 'coin') {
           const mult = this.player.doubleActive ? 2 : 1;
-          this.coins += 1 * mult;
+          const gained = Math.round(1 * mult * this.comboMultiplier);
+          this.coins += gained;
+          this.feverMeter = Math.min(100, this.feverMeter + 4);
+          
+          if (this.feverMeter >= 100 && this.hyperTimer <= 0) {
+            this.triggerHyperMode();
+          }
+
           AudioSys.playSFX('coin');
+          ParticleSys.emitCoinSparkle(p.x, p.y);
+          ParticleSys.addFloatingText(p.x, p.y - 10, `+${gained}`, '#ffd700', 14);
         } else if (p.type === 'shield') {
           this.player.hasShield = true;
           AudioSys.playSFX('powerup');
+          ParticleSys.addFloatingText(p.x, p.y - 15, 'SHIELD!', '#00f0ff', 16);
         } else if (p.type === 'magnet') {
           this.timers.magnet = Math.max(this.timers.magnet, 8.0);
           this.player.magnetActive = true;
           AudioSys.playSFX('powerup');
+          ParticleSys.addFloatingText(p.x, p.y - 15, 'MAGNET!', '#ff4444', 16);
         } else if (p.type === 'gravity') {
           this.timers.gravity = Math.max(this.timers.gravity, 10.0);
           this.player.gravityActive = true;
           AudioSys.playSFX('powerup');
+          ParticleSys.addFloatingText(p.x, p.y - 15, 'GRAVITY CORE!', '#d844ff', 16);
         } else if (p.type === 'double') {
           this.timers.double = Math.max(this.timers.double, 10.0);
           this.player.doubleActive = true;
           AudioSys.playSFX('powerup');
+          ParticleSys.addFloatingText(p.x, p.y - 15, '2X MULTIPLIER!', '#ffd700', 16);
         }
 
         this.pickups.splice(i, 1);
@@ -326,13 +407,11 @@ class Game {
     this.ctx.clearRect(0, 0, this.width, this.height);
 
     this.ctx.save();
-    // Apply camera shake
     CameraSys.apply(this.ctx);
 
-    // 1. Draw Parallax Backgrounds
+    // Dynamic Biome tinting
     this.drawParallax();
 
-    // 2. Draw Obstacles & Pickups
     for (const obs of this.obstacles) {
       obs.draw(this.ctx);
     }
@@ -340,21 +419,33 @@ class Game {
       p.draw(this.ctx);
     }
 
-    // 3. Draw Player
     if (this.state === 'PLAYING' || this.state === 'PAUSED') {
       this.player.draw(this.ctx);
     }
 
+    // Draw Particles on top of world
+    ParticleSys.draw(this.ctx);
+
     this.ctx.restore();
 
-    // 4. Draw UI Overlays
+    // Draw UI Overlays
     this.ui.draw(this.ctx);
   }
 
   drawParallax() {
     const { ctx } = this;
 
-    // Sky Layer
+    // Apply Biome hue based on distance
+    ctx.save();
+    if (this.distance > 1200) {
+      // Emerald Cyber Core
+      ctx.filter = 'hue-rotate(90deg) saturate(1.2)';
+    } else if (this.distance > 500) {
+      // Synthwave Sunset
+      ctx.filter = 'hue-rotate(280deg) saturate(1.3)';
+    }
+
+    // Sky
     if (this.bgImages.sky.complete && this.bgImages.sky.naturalWidth > 0) {
       const offX = -this.bgOffsets.sky;
       ctx.drawImage(this.bgImages.sky, offX, 0, 1280, 720);
@@ -364,21 +455,23 @@ class Game {
       ctx.fillRect(0, 0, 1280, 720);
     }
 
-    // Far Buildings Layer
+    // Far Buildings
     if (this.bgImages.far.complete && this.bgImages.far.naturalWidth > 0) {
       const offX = -this.bgOffsets.far;
       ctx.drawImage(this.bgImages.far, offX, 0, 1280, 720);
       ctx.drawImage(this.bgImages.far, offX + 1280, 0, 1280, 720);
     }
 
-    // Mid Buildings Layer
+    // Mid Buildings
     if (this.bgImages.mid.complete && this.bgImages.mid.naturalWidth > 0) {
       const offX = -this.bgOffsets.mid;
       ctx.drawImage(this.bgImages.mid, offX, 0, 1280, 720);
       ctx.drawImage(this.bgImages.mid, offX + 1280, 0, 1280, 720);
     }
 
-    // Ceiling Track (Y: 76 to 140)
+    ctx.restore(); // Restore filter
+
+    // Ceiling Track
     const ceilOffX = -this.bgOffsets.ceiling;
     for (let x = ceilOffX - 256; x < 1280 + 256; x += 256) {
       if (this.bgImages.ceiling.complete && this.bgImages.ceiling.naturalWidth > 0) {
@@ -389,7 +482,7 @@ class Game {
       }
     }
 
-    // Floor Track (Y: 580 to 644)
+    // Floor Track
     const floorOffX = -this.bgOffsets.floor;
     for (let x = floorOffX - 256; x < 1280 + 256; x += 256) {
       if (this.bgImages.floor.complete && this.bgImages.floor.naturalWidth > 0) {
@@ -412,7 +505,6 @@ class Game {
   }
 }
 
-// Start game when page loads
 window.addEventListener('load', () => {
   window.pixelRunner = new Game();
 });

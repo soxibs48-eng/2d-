@@ -1,5 +1,5 @@
 // ==========================================
-// PIXEL RUNNER: PROCEDURAL SPAWNER
+// PIXEL RUNNER: PROCEDURAL SPAWNER (v2.1 OVERHAUL)
 // ==========================================
 
 class Spawner {
@@ -20,13 +20,13 @@ class Spawner {
 
     if (this.spawnTimer <= 0) {
       this.spawnPattern(obstacles, pickups);
-      const baseGap = 480 + Math.random() * 220;
-      this.spawnTimer = Math.max(0.75, Math.min(2.0, baseGap / gameSpeed));
+      const baseGap = 460 + Math.random() * 200;
+      this.spawnTimer = Math.max(0.70, Math.min(1.9, baseGap / gameSpeed));
     }
   }
 
   spawnPattern(obstacles, pickups) {
-    const roll = Math.floor(Math.random() * 8);
+    const roll = Math.floor(Math.random() * 9);
 
     switch (roll) {
       case 0:
@@ -55,7 +55,7 @@ class Spawner {
         break;
 
       case 3:
-        // Floating Mine
+        // Floating Cyber Mine
         const mineY = 280 + Math.random() * 160;
         obstacles.push(new Obstacle('floating_mine', this.spawnX, mineY));
         this.spawnCoinLine(pickups, this.spawnX + 60, this.floorY - 20, 3);
@@ -77,18 +77,25 @@ class Spawner {
         break;
 
       case 6:
-        // Pure Coin Wave + Rare Powerup
+        // NEW: Spinning Laser Saw obstacle!
+        const sawY = Math.random() > 0.5 ? this.floorY - 30 : this.ceilingY + 30;
+        obstacles.push(new Obstacle('laser_saw', this.spawnX, sawY));
+        this.spawnCoinArc(pickups, this.spawnX - 40, sawY > this.midY ? sawY - 90 : sawY + 90, 4);
+        break;
+
+      case 7:
+        // Pure Coin Wave + Powerup
         this.spawnCoinLine(pickups, this.spawnX, this.floorY - 30, 6);
         if (Math.random() > 0.4) {
           this.spawnRandomPowerup(pickups, this.spawnX + 300, this.floorY - 30);
         }
         break;
 
-      case 7:
-        // Powerup protected by aerial mine
+      case 8:
+        // Powerup flanked by spinning saws
         this.spawnRandomPowerup(pickups, this.spawnX, this.midY);
-        obstacles.push(new Obstacle('floating_mine', this.spawnX - 120, this.floorY - 30));
-        obstacles.push(new Obstacle('floating_mine', this.spawnX + 120, this.ceilingY + 30));
+        obstacles.push(new Obstacle('laser_saw', this.spawnX - 130, this.floorY - 30));
+        obstacles.push(new Obstacle('laser_saw', this.spawnX + 130, this.ceilingY + 30));
         break;
     }
   }
