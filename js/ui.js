@@ -709,41 +709,54 @@ class UIManager {
     ctx.fillRect(0, 0, 1280, 720);
 
     ctx.fillStyle = '#0f291e';
-    ctx.fillRect(400, 120, 480, 480);
+    ctx.fillRect(380, 100, 520, 520);
     ctx.strokeStyle = '#00ffcc';
     ctx.lineWidth = 3;
-    ctx.strokeRect(400, 120, 480, 480);
+    ctx.strokeRect(380, 100, 520, 520);
+
+    const stData = StageDatabase.getStage(this.game.currentStage);
+    const nextStData = this.game.currentStage < 100 ? StageDatabase.getStage(this.game.currentStage + 1) : null;
 
     ctx.fillStyle = '#00ffcc';
-    ctx.font = '28px "Press Start 2P", monospace';
+    ctx.font = '26px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`${this.game.currentStage}-BOSQICH YAKUNLANDI!`, 640, 185);
+    ctx.fillText(`${this.game.currentStage}-BOSQICH YAKUNLANDI!`, 640, 160);
 
     ctx.fillStyle = '#ffd700';
-    ctx.font = '26px "Press Start 2P", monospace';
-    ctx.fillText("★★★", 640, 245);
+    ctx.font = '24px "Press Start 2P", monospace';
+    ctx.fillText("★★★", 640, 215);
+
+    // Distance completed
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.fillText(`MASOFA: ${stData.targetDistance}M BOSIB O'TILDI!`, 640, 265);
+
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '13px "Press Start 2P", monospace';
+    ctx.fillText(`Mukofot: +${this.game.stageBonus} Tanga!`, 640, 310);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '14px "Press Start 2P", monospace';
-    ctx.fillText(`Mukofot: +${this.game.stageBonus} Tanga!`, 640, 310);
+    ctx.font = '13px "Press Start 2P", monospace';
     ctx.fillText(`Yig'ilgan tangalar: ${this.game.coins}`, 640, 350);
-    ctx.textAlign = 'left';
 
     if (this.game.currentStage < 100) {
-      this.addButton('stage_next', 460, 410, 360, 50, `KEYINGI BOSQICH (${this.game.currentStage + 1}) >>`, () => {
+      ctx.fillStyle = '#88aacc';
+      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.fillText(`Keyingi bosqich masofasi: ${nextStData.targetDistance}m (yana ${nextStData.targetDistance - stData.targetDistance}m uzunroq!)`, 640, 395);
+
+      this.addButton('stage_next', 410, 425, 460, 50, `KEYINGI (${this.game.currentStage + 1}-BOSQICH: ${nextStData.targetDistance}M) >>`, () => {
         this.game.startStage(this.game.currentStage + 1);
       }, '#00ffcc');
     } else {
       ctx.fillStyle = '#ffd700';
-      ctx.font = '16px "Press Start 2P", monospace';
-      ctx.textAlign = 'center';
+      ctx.font = '15px "Press Start 2P", monospace';
       ctx.fillText("★ TABRIKLAYMIZ! BARCHA 100 TA BOSQICH YUTILDI! ★", 640, 430);
-      ctx.textAlign = 'left';
     }
 
-    this.addButton('stage_menu', 460, 480, 360, 46, "BOSQICHLAR XARITASI", () => {
+    this.addButton('stage_menu', 440, 495, 400, 46, "BOSQICHLAR XARITASI", () => {
       this.game.state = 'LEVEL_SELECT';
     }, '#00f0ff');
+    ctx.textAlign = 'left';
   }
 
   drawPauseMenu(ctx) {

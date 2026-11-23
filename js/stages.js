@@ -30,9 +30,12 @@ class StageDatabase {
     const secIdx = Math.min(9, Math.floor((sNum - 1) / 10));
     const sector = SECTORS_DATA[secIdx];
 
-    // Distance scales: 300m for stage 1 up to 2300m for stage 100
-    const targetDist = 300 + (sNum - 1) * 20;
-    const coinBonus = 35 + sNum * 8;
+    // Progressive distance scaling: Starts at 350m, increasing with each stage up to 13,940m (~14km)!
+    const sectorBases = [350, 850, 1500, 2300, 3300, 4500, 5900, 7500, 9400, 11600];
+    const sectorSteps = [50, 65, 80, 100, 120, 140, 160, 190, 220, 260];
+    const offset = (sNum - 1) % 10;
+    const targetDist = sectorBases[secIdx] + offset * sectorSteps[secIdx];
+    const coinBonus = 40 + sNum * 12 + secIdx * 25;
     const isBoss = (sNum % 10 === 0) || (sNum === 25) || (sNum === 75) || (sNum === 100);
 
     let bossInfo = null;

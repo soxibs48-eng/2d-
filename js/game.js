@@ -6,7 +6,7 @@ class Game {
   constructor() {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
-    
+
     this.width = 1280;
     this.height = 720;
 
@@ -62,7 +62,7 @@ class Game {
 
     this.loadBackgrounds();
     this.bindInputs();
-    
+
     this.lastTime = performance.now();
     requestAnimationFrame((t) => this.loop(t));
   }
@@ -359,7 +359,7 @@ class Game {
     this.state = 'PLAYING';
     AudioSys.startBGM();
     AudioSys.playSFX('powerup');
-    ParticleSys.addFloatingText(640, 240, `${this.currentStage}-BOSQICH BOSHLANDI!`, '#00f0ff', 24);
+    ParticleSys.addFloatingText(640, 240, `${this.currentStage}-BOSQICH: ${stageData.targetDistance}M BOSHLANDI!`, '#00f0ff', 24);
   }
 
   startEndlessGame() {
@@ -411,7 +411,7 @@ class Game {
     }
 
     ParticleSys.addShockwave(640, 360, '#00ffcc');
-    const clearText = this.currentStage >= 100 ? '★ 100-BOSQICH G\'ALABASI! ★' : `★ ${this.currentStage}-BOSQICH YAKUNLANDI! ★`;
+    const clearText = this.currentStage >= 100 ? '★ 100-BOSQICH G\'ALABASI! ★' : `★ ${this.currentStage}-BOSQICH: ${stageData.targetDistance}M YAKUNLANDI! ★`;
     ParticleSys.addFloatingText(640, 280, clearText, '#00ffcc', 26);
   }
 
