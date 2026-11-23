@@ -1,33 +1,1214 @@
 {
+  "total_stages": 100,
+  "sectors": 10,
   "stages": [
     {
       "id": 1,
-      "name": "NEON CITY",
-      "target_distance": 400,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 1",
+      "target_distance": 300,
       "theme": "cyber_blue",
-      "coin_bonus": 35,
-      "description": "Kirish bosqichi: Sakrash, 2-marta sakrash va pastki lazerlar ostidan yotib o'tish."
+      "coin_bonus": 38,
+      "description": "1-bosqich (NEON CITY OUTSKIRTS). Masofa: 300m. Mukofot: +38 tanga.",
+      "is_boss": false
     },
     {
       "id": 2,
-      "name": "GRAVITY ANOMALY",
-      "target_distance": 600,
-      "theme": "synthwave_purple",
-      "coin_bonus": 70,
-      "description": "Murakkab gravitatsiya anomaliyasi: Shiftda yugurish, aylanuvchi lazer arralar va portal labirinti."
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 2",
+      "target_distance": 320,
+      "theme": "cyber_blue",
+      "coin_bonus": 46,
+      "description": "2-bosqich (NEON CITY OUTSKIRTS). Masofa: 320m. Mukofot: +46 tanga.",
+      "is_boss": false
     },
     {
       "id": 3,
-      "name": "CYBER MATRIX & BOSS",
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 3",
+      "target_distance": 340,
+      "theme": "cyber_blue",
+      "coin_bonus": 54,
+      "description": "3-bosqich (NEON CITY OUTSKIRTS). Masofa: 340m. Mukofot: +54 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 4,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 4",
+      "target_distance": 360,
+      "theme": "cyber_blue",
+      "coin_bonus": 62,
+      "description": "4-bosqich (NEON CITY OUTSKIRTS). Masofa: 360m. Mukofot: +62 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 5,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 5",
+      "target_distance": 380,
+      "theme": "cyber_blue",
+      "coin_bonus": 70,
+      "description": "5-bosqich (NEON CITY OUTSKIRTS). Masofa: 380m. Mukofot: +70 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 6,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 6",
+      "target_distance": 400,
+      "theme": "cyber_blue",
+      "coin_bonus": 78,
+      "description": "6-bosqich (NEON CITY OUTSKIRTS). Masofa: 400m. Mukofot: +78 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 7,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 7",
+      "target_distance": 420,
+      "theme": "cyber_blue",
+      "coin_bonus": 86,
+      "description": "7-bosqich (NEON CITY OUTSKIRTS). Masofa: 420m. Mukofot: +86 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 8,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 8",
+      "target_distance": 440,
+      "theme": "cyber_blue",
+      "coin_bonus": 94,
+      "description": "8-bosqich (NEON CITY OUTSKIRTS). Masofa: 440m. Mukofot: +94 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 9,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 9",
+      "target_distance": 460,
+      "theme": "cyber_blue",
+      "coin_bonus": 102,
+      "description": "9-bosqich (NEON CITY OUTSKIRTS). Masofa: 460m. Mukofot: +102 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 10,
+      "sector": 1,
+      "sector_name": "NEON CITY OUTSKIRTS",
+      "name": "NEON - 10 👑 [Mini Goliath]",
+      "target_distance": 480,
+      "theme": "cyber_blue",
+      "coin_bonus": 110,
+      "description": "10-bosqich (NEON CITY OUTSKIRTS). Masofa: 480m. Mukofot: +110 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Mini Goliath",
+        "hp": 60,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 1",
+      "target_distance": 500,
+      "theme": "synthwave_purple",
+      "coin_bonus": 118,
+      "description": "11-bosqich (GRAVITY LABORATORIES). Masofa: 500m. Mukofot: +118 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 12,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 2",
+      "target_distance": 520,
+      "theme": "synthwave_purple",
+      "coin_bonus": 126,
+      "description": "12-bosqich (GRAVITY LABORATORIES). Masofa: 520m. Mukofot: +126 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 13,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 3",
+      "target_distance": 540,
+      "theme": "synthwave_purple",
+      "coin_bonus": 134,
+      "description": "13-bosqich (GRAVITY LABORATORIES). Masofa: 540m. Mukofot: +134 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 14,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 4",
+      "target_distance": 560,
+      "theme": "synthwave_purple",
+      "coin_bonus": 142,
+      "description": "14-bosqich (GRAVITY LABORATORIES). Masofa: 560m. Mukofot: +142 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 15,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 5",
+      "target_distance": 580,
+      "theme": "synthwave_purple",
+      "coin_bonus": 150,
+      "description": "15-bosqich (GRAVITY LABORATORIES). Masofa: 580m. Mukofot: +150 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 16,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 6",
+      "target_distance": 600,
+      "theme": "synthwave_purple",
+      "coin_bonus": 158,
+      "description": "16-bosqich (GRAVITY LABORATORIES). Masofa: 600m. Mukofot: +158 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 17,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 7",
+      "target_distance": 620,
+      "theme": "synthwave_purple",
+      "coin_bonus": 166,
+      "description": "17-bosqich (GRAVITY LABORATORIES). Masofa: 620m. Mukofot: +166 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 18,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 8",
+      "target_distance": 640,
+      "theme": "synthwave_purple",
+      "coin_bonus": 174,
+      "description": "18-bosqich (GRAVITY LABORATORIES). Masofa: 640m. Mukofot: +174 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 19,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 9",
+      "target_distance": 660,
+      "theme": "synthwave_purple",
+      "coin_bonus": 182,
+      "description": "19-bosqich (GRAVITY LABORATORIES). Masofa: 660m. Mukofot: +182 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 20,
+      "sector": 2,
+      "sector_name": "GRAVITY LABORATORIES",
+      "name": "GRAVITY - 10 👑 [Mini Goliath]",
+      "target_distance": 680,
+      "theme": "synthwave_purple",
+      "coin_bonus": 190,
+      "description": "20-bosqich (GRAVITY LABORATORIES). Masofa: 680m. Mukofot: +190 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Mini Goliath",
+        "hp": 70,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 1",
+      "target_distance": 700,
+      "theme": "amber_sunset",
+      "coin_bonus": 198,
+      "description": "21-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 700m. Mukofot: +198 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 22,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 2",
+      "target_distance": 720,
+      "theme": "amber_sunset",
+      "coin_bonus": 206,
+      "description": "22-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 720m. Mukofot: +206 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 23,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 3",
+      "target_distance": 740,
+      "theme": "amber_sunset",
+      "coin_bonus": 214,
+      "description": "23-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 740m. Mukofot: +214 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 24,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 4",
+      "target_distance": 760,
+      "theme": "amber_sunset",
+      "coin_bonus": 222,
+      "description": "24-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 760m. Mukofot: +222 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 25,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 5 👑 [Mini Goliath]",
+      "target_distance": 780,
+      "theme": "amber_sunset",
+      "coin_bonus": 230,
+      "description": "25-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 780m. Mukofot: +230 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Mini Goliath",
+        "hp": 70,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 6",
       "target_distance": 800,
+      "theme": "amber_sunset",
+      "coin_bonus": 238,
+      "description": "26-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 800m. Mukofot: +238 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 27,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 7",
+      "target_distance": 820,
+      "theme": "amber_sunset",
+      "coin_bonus": 246,
+      "description": "27-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 820m. Mukofot: +246 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 28,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 8",
+      "target_distance": 840,
+      "theme": "amber_sunset",
+      "coin_bonus": 254,
+      "description": "28-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 840m. Mukofot: +254 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 29,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 9",
+      "target_distance": 860,
+      "theme": "amber_sunset",
+      "coin_bonus": 262,
+      "description": "29-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 860m. Mukofot: +262 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 30,
+      "sector": 3,
+      "sector_name": "CYBER HIGHWAY & PATROLS",
+      "name": "CYBER - 10 👑 [Cyber Goliath]",
+      "target_distance": 880,
+      "theme": "amber_sunset",
+      "coin_bonus": 270,
+      "description": "30-bosqich (CYBER HIGHWAY & PATROLS). Masofa: 880m. Mukofot: +270 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Cyber Goliath",
+        "hp": 80,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 31,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 1",
+      "target_distance": 900,
+      "theme": "crimson_forge",
+      "coin_bonus": 278,
+      "description": "31-bosqich (INDUSTRIAL FOUNDRY). Masofa: 900m. Mukofot: +278 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 32,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 2",
+      "target_distance": 920,
+      "theme": "crimson_forge",
+      "coin_bonus": 286,
+      "description": "32-bosqich (INDUSTRIAL FOUNDRY). Masofa: 920m. Mukofot: +286 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 33,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 3",
+      "target_distance": 940,
+      "theme": "crimson_forge",
+      "coin_bonus": 294,
+      "description": "33-bosqich (INDUSTRIAL FOUNDRY). Masofa: 940m. Mukofot: +294 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 34,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 4",
+      "target_distance": 960,
+      "theme": "crimson_forge",
+      "coin_bonus": 302,
+      "description": "34-bosqich (INDUSTRIAL FOUNDRY). Masofa: 960m. Mukofot: +302 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 35,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 5",
+      "target_distance": 980,
+      "theme": "crimson_forge",
+      "coin_bonus": 310,
+      "description": "35-bosqich (INDUSTRIAL FOUNDRY). Masofa: 980m. Mukofot: +310 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 36,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 6",
+      "target_distance": 1000,
+      "theme": "crimson_forge",
+      "coin_bonus": 318,
+      "description": "36-bosqich (INDUSTRIAL FOUNDRY). Masofa: 1000m. Mukofot: +318 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 37,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 7",
+      "target_distance": 1020,
+      "theme": "crimson_forge",
+      "coin_bonus": 326,
+      "description": "37-bosqich (INDUSTRIAL FOUNDRY). Masofa: 1020m. Mukofot: +326 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 38,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 8",
+      "target_distance": 1040,
+      "theme": "crimson_forge",
+      "coin_bonus": 334,
+      "description": "38-bosqich (INDUSTRIAL FOUNDRY). Masofa: 1040m. Mukofot: +334 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 39,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 9",
+      "target_distance": 1060,
+      "theme": "crimson_forge",
+      "coin_bonus": 342,
+      "description": "39-bosqich (INDUSTRIAL FOUNDRY). Masofa: 1060m. Mukofot: +342 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 40,
+      "sector": 4,
+      "sector_name": "INDUSTRIAL FOUNDRY",
+      "name": "INDUSTRIAL - 10 👑 [Cyber Goliath]",
+      "target_distance": 1080,
+      "theme": "crimson_forge",
+      "coin_bonus": 350,
+      "description": "40-bosqich (INDUSTRIAL FOUNDRY). Masofa: 1080m. Mukofot: +350 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Cyber Goliath",
+        "hp": 90,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 41,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 1",
+      "target_distance": 1100,
       "theme": "matrix_green",
-      "coin_bonus": 105,
+      "coin_bonus": 358,
+      "description": "41-bosqich (ELECTRO STORM MATRIX). Masofa: 1100m. Mukofot: +358 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 42,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 2",
+      "target_distance": 1120,
+      "theme": "matrix_green",
+      "coin_bonus": 366,
+      "description": "42-bosqich (ELECTRO STORM MATRIX). Masofa: 1120m. Mukofot: +366 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 43,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 3",
+      "target_distance": 1140,
+      "theme": "matrix_green",
+      "coin_bonus": 374,
+      "description": "43-bosqich (ELECTRO STORM MATRIX). Masofa: 1140m. Mukofot: +374 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 44,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 4",
+      "target_distance": 1160,
+      "theme": "matrix_green",
+      "coin_bonus": 382,
+      "description": "44-bosqich (ELECTRO STORM MATRIX). Masofa: 1160m. Mukofot: +382 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 45,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 5",
+      "target_distance": 1180,
+      "theme": "matrix_green",
+      "coin_bonus": 390,
+      "description": "45-bosqich (ELECTRO STORM MATRIX). Masofa: 1180m. Mukofot: +390 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 46,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 6",
+      "target_distance": 1200,
+      "theme": "matrix_green",
+      "coin_bonus": 398,
+      "description": "46-bosqich (ELECTRO STORM MATRIX). Masofa: 1200m. Mukofot: +398 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 47,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 7",
+      "target_distance": 1220,
+      "theme": "matrix_green",
+      "coin_bonus": 406,
+      "description": "47-bosqich (ELECTRO STORM MATRIX). Masofa: 1220m. Mukofot: +406 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 48,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 8",
+      "target_distance": 1240,
+      "theme": "matrix_green",
+      "coin_bonus": 414,
+      "description": "48-bosqich (ELECTRO STORM MATRIX). Masofa: 1240m. Mukofot: +414 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 49,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 9",
+      "target_distance": 1260,
+      "theme": "matrix_green",
+      "coin_bonus": 422,
+      "description": "49-bosqich (ELECTRO STORM MATRIX). Masofa: 1260m. Mukofot: +422 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 50,
+      "sector": 5,
+      "sector_name": "ELECTRO STORM MATRIX",
+      "name": "ELECTRO - 10 👑 [Cyber Goliath]",
+      "target_distance": 1280,
+      "theme": "matrix_green",
+      "coin_bonus": 430,
+      "description": "50-bosqich (ELECTRO STORM MATRIX). Masofa: 1280m. Mukofot: +430 tanga.",
+      "is_boss": true,
       "boss": {
         "name": "Cyber Goliath",
         "hp": 100,
-        "attacks": ["plasma_torpedo", "laser_beam", "ceiling_rocket"]
-      },
-      "description": "Hal qiluvchi bosqich: Kiber dushmanlar va Cyber Goliath bossi bilan jang!"
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 51,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 1",
+      "target_distance": 1300,
+      "theme": "crystal_cyan",
+      "coin_bonus": 438,
+      "description": "51-bosqich (CRYSTAL VOID). Masofa: 1300m. Mukofot: +438 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 52,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 2",
+      "target_distance": 1320,
+      "theme": "crystal_cyan",
+      "coin_bonus": 446,
+      "description": "52-bosqich (CRYSTAL VOID). Masofa: 1320m. Mukofot: +446 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 53,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 3",
+      "target_distance": 1340,
+      "theme": "crystal_cyan",
+      "coin_bonus": 454,
+      "description": "53-bosqich (CRYSTAL VOID). Masofa: 1340m. Mukofot: +454 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 54,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 4",
+      "target_distance": 1360,
+      "theme": "crystal_cyan",
+      "coin_bonus": 462,
+      "description": "54-bosqich (CRYSTAL VOID). Masofa: 1360m. Mukofot: +462 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 55,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 5",
+      "target_distance": 1380,
+      "theme": "crystal_cyan",
+      "coin_bonus": 470,
+      "description": "55-bosqich (CRYSTAL VOID). Masofa: 1380m. Mukofot: +470 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 56,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 6",
+      "target_distance": 1400,
+      "theme": "crystal_cyan",
+      "coin_bonus": 478,
+      "description": "56-bosqich (CRYSTAL VOID). Masofa: 1400m. Mukofot: +478 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 57,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 7",
+      "target_distance": 1420,
+      "theme": "crystal_cyan",
+      "coin_bonus": 486,
+      "description": "57-bosqich (CRYSTAL VOID). Masofa: 1420m. Mukofot: +486 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 58,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 8",
+      "target_distance": 1440,
+      "theme": "crystal_cyan",
+      "coin_bonus": 494,
+      "description": "58-bosqich (CRYSTAL VOID). Masofa: 1440m. Mukofot: +494 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 59,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 9",
+      "target_distance": 1460,
+      "theme": "crystal_cyan",
+      "coin_bonus": 502,
+      "description": "59-bosqich (CRYSTAL VOID). Masofa: 1460m. Mukofot: +502 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 60,
+      "sector": 6,
+      "sector_name": "CRYSTAL VOID",
+      "name": "CRYSTAL - 10 👑 [Cyber Goliath]",
+      "target_distance": 1480,
+      "theme": "crystal_cyan",
+      "coin_bonus": 510,
+      "description": "60-bosqich (CRYSTAL VOID). Masofa: 1480m. Mukofot: +510 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Cyber Goliath",
+        "hp": 110,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 61,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 1",
+      "target_distance": 1500,
+      "theme": "midnight_navy",
+      "coin_bonus": 518,
+      "description": "61-bosqich (DARK CYBER RUINS). Masofa: 1500m. Mukofot: +518 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 62,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 2",
+      "target_distance": 1520,
+      "theme": "midnight_navy",
+      "coin_bonus": 526,
+      "description": "62-bosqich (DARK CYBER RUINS). Masofa: 1520m. Mukofot: +526 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 63,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 3",
+      "target_distance": 1540,
+      "theme": "midnight_navy",
+      "coin_bonus": 534,
+      "description": "63-bosqich (DARK CYBER RUINS). Masofa: 1540m. Mukofot: +534 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 64,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 4",
+      "target_distance": 1560,
+      "theme": "midnight_navy",
+      "coin_bonus": 542,
+      "description": "64-bosqich (DARK CYBER RUINS). Masofa: 1560m. Mukofot: +542 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 65,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 5",
+      "target_distance": 1580,
+      "theme": "midnight_navy",
+      "coin_bonus": 550,
+      "description": "65-bosqich (DARK CYBER RUINS). Masofa: 1580m. Mukofot: +550 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 66,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 6",
+      "target_distance": 1600,
+      "theme": "midnight_navy",
+      "coin_bonus": 558,
+      "description": "66-bosqich (DARK CYBER RUINS). Masofa: 1600m. Mukofot: +558 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 67,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 7",
+      "target_distance": 1620,
+      "theme": "midnight_navy",
+      "coin_bonus": 566,
+      "description": "67-bosqich (DARK CYBER RUINS). Masofa: 1620m. Mukofot: +566 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 68,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 8",
+      "target_distance": 1640,
+      "theme": "midnight_navy",
+      "coin_bonus": 574,
+      "description": "68-bosqich (DARK CYBER RUINS). Masofa: 1640m. Mukofot: +574 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 69,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 9",
+      "target_distance": 1660,
+      "theme": "midnight_navy",
+      "coin_bonus": 582,
+      "description": "69-bosqich (DARK CYBER RUINS). Masofa: 1660m. Mukofot: +582 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 70,
+      "sector": 7,
+      "sector_name": "DARK CYBER RUINS",
+      "name": "DARK - 10 👑 [Cyber Goliath]",
+      "target_distance": 1680,
+      "theme": "midnight_navy",
+      "coin_bonus": 590,
+      "description": "70-bosqich (DARK CYBER RUINS). Masofa: 1680m. Mukofot: +590 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Cyber Goliath",
+        "hp": 120,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 71,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 1",
+      "target_distance": 1700,
+      "theme": "plasma_violet",
+      "coin_bonus": 598,
+      "description": "71-bosqich (QUANTUM CORE). Masofa: 1700m. Mukofot: +598 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 72,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 2",
+      "target_distance": 1720,
+      "theme": "plasma_violet",
+      "coin_bonus": 606,
+      "description": "72-bosqich (QUANTUM CORE). Masofa: 1720m. Mukofot: +606 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 73,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 3",
+      "target_distance": 1740,
+      "theme": "plasma_violet",
+      "coin_bonus": 614,
+      "description": "73-bosqich (QUANTUM CORE). Masofa: 1740m. Mukofot: +614 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 74,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 4",
+      "target_distance": 1760,
+      "theme": "plasma_violet",
+      "coin_bonus": 622,
+      "description": "74-bosqich (QUANTUM CORE). Masofa: 1760m. Mukofot: +622 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 75,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 5 👑 [Cyber Goliath]",
+      "target_distance": 1780,
+      "theme": "plasma_violet",
+      "coin_bonus": 630,
+      "description": "75-bosqich (QUANTUM CORE). Masofa: 1780m. Mukofot: +630 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Cyber Goliath",
+        "hp": 120,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 76,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 6",
+      "target_distance": 1800,
+      "theme": "plasma_violet",
+      "coin_bonus": 638,
+      "description": "76-bosqich (QUANTUM CORE). Masofa: 1800m. Mukofot: +638 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 77,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 7",
+      "target_distance": 1820,
+      "theme": "plasma_violet",
+      "coin_bonus": 646,
+      "description": "77-bosqich (QUANTUM CORE). Masofa: 1820m. Mukofot: +646 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 78,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 8",
+      "target_distance": 1840,
+      "theme": "plasma_violet",
+      "coin_bonus": 654,
+      "description": "78-bosqich (QUANTUM CORE). Masofa: 1840m. Mukofot: +654 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 79,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 9",
+      "target_distance": 1860,
+      "theme": "plasma_violet",
+      "coin_bonus": 662,
+      "description": "79-bosqich (QUANTUM CORE). Masofa: 1860m. Mukofot: +662 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 80,
+      "sector": 8,
+      "sector_name": "QUANTUM CORE",
+      "name": "QUANTUM - 10 👑 [Omega Goliath (FINAL)]",
+      "target_distance": 1880,
+      "theme": "plasma_violet",
+      "coin_bonus": 670,
+      "description": "80-bosqich (QUANTUM CORE). Masofa: 1880m. Mukofot: +670 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Omega Goliath (FINAL)",
+        "hp": 130,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 81,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 1",
+      "target_distance": 1900,
+      "theme": "gold_armory",
+      "coin_bonus": 678,
+      "description": "81-bosqich (TITAN FORTRESS). Masofa: 1900m. Mukofot: +678 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 82,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 2",
+      "target_distance": 1920,
+      "theme": "gold_armory",
+      "coin_bonus": 686,
+      "description": "82-bosqich (TITAN FORTRESS). Masofa: 1920m. Mukofot: +686 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 83,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 3",
+      "target_distance": 1940,
+      "theme": "gold_armory",
+      "coin_bonus": 694,
+      "description": "83-bosqich (TITAN FORTRESS). Masofa: 1940m. Mukofot: +694 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 84,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 4",
+      "target_distance": 1960,
+      "theme": "gold_armory",
+      "coin_bonus": 702,
+      "description": "84-bosqich (TITAN FORTRESS). Masofa: 1960m. Mukofot: +702 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 85,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 5",
+      "target_distance": 1980,
+      "theme": "gold_armory",
+      "coin_bonus": 710,
+      "description": "85-bosqich (TITAN FORTRESS). Masofa: 1980m. Mukofot: +710 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 86,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 6",
+      "target_distance": 2000,
+      "theme": "gold_armory",
+      "coin_bonus": 718,
+      "description": "86-bosqich (TITAN FORTRESS). Masofa: 2000m. Mukofot: +718 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 87,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 7",
+      "target_distance": 2020,
+      "theme": "gold_armory",
+      "coin_bonus": 726,
+      "description": "87-bosqich (TITAN FORTRESS). Masofa: 2020m. Mukofot: +726 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 88,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 8",
+      "target_distance": 2040,
+      "theme": "gold_armory",
+      "coin_bonus": 734,
+      "description": "88-bosqich (TITAN FORTRESS). Masofa: 2040m. Mukofot: +734 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 89,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 9",
+      "target_distance": 2060,
+      "theme": "gold_armory",
+      "coin_bonus": 742,
+      "description": "89-bosqich (TITAN FORTRESS). Masofa: 2060m. Mukofot: +742 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 90,
+      "sector": 9,
+      "sector_name": "TITAN FORTRESS",
+      "name": "TITAN - 10 👑 [Omega Goliath (FINAL)]",
+      "target_distance": 2080,
+      "theme": "gold_armory",
+      "coin_bonus": 750,
+      "description": "90-bosqich (TITAN FORTRESS). Masofa: 2080m. Mukofot: +750 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Omega Goliath (FINAL)",
+        "hp": 140,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
+    },
+    {
+      "id": 91,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 1",
+      "target_distance": 2100,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 758,
+      "description": "91-bosqich (CYBER APEX MATRIX). Masofa: 2100m. Mukofot: +758 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 92,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 2",
+      "target_distance": 2120,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 766,
+      "description": "92-bosqich (CYBER APEX MATRIX). Masofa: 2120m. Mukofot: +766 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 93,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 3",
+      "target_distance": 2140,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 774,
+      "description": "93-bosqich (CYBER APEX MATRIX). Masofa: 2140m. Mukofot: +774 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 94,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 4",
+      "target_distance": 2160,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 782,
+      "description": "94-bosqich (CYBER APEX MATRIX). Masofa: 2160m. Mukofot: +782 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 95,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 5",
+      "target_distance": 2180,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 790,
+      "description": "95-bosqich (CYBER APEX MATRIX). Masofa: 2180m. Mukofot: +790 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 96,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 6",
+      "target_distance": 2200,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 798,
+      "description": "96-bosqich (CYBER APEX MATRIX). Masofa: 2200m. Mukofot: +798 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 97,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 7",
+      "target_distance": 2220,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 806,
+      "description": "97-bosqich (CYBER APEX MATRIX). Masofa: 2220m. Mukofot: +806 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 98,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 8",
+      "target_distance": 2240,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 814,
+      "description": "98-bosqich (CYBER APEX MATRIX). Masofa: 2240m. Mukofot: +814 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 99,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 9",
+      "target_distance": 2260,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 822,
+      "description": "99-bosqich (CYBER APEX MATRIX). Masofa: 2260m. Mukofot: +822 tanga.",
+      "is_boss": false
+    },
+    {
+      "id": 100,
+      "sector": 10,
+      "sector_name": "CYBER APEX MATRIX",
+      "name": "CYBER - 10 👑 [Omega Goliath (FINAL)]",
+      "target_distance": 2280,
+      "theme": "rainbow_hyper",
+      "coin_bonus": 830,
+      "description": "100-bosqich (CYBER APEX MATRIX). Masofa: 2280m. Mukofot: +830 tanga.",
+      "is_boss": true,
+      "boss": {
+        "name": "Omega Goliath (FINAL)",
+        "hp": 150,
+        "attacks": [
+          "plasma_torpedo",
+          "laser_beam",
+          "ceiling_rocket"
+        ]
+      }
     }
   ]
 }

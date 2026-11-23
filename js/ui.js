@@ -282,7 +282,10 @@ class UIManager {
 
     // 2-COLUMN BUTTON LAYOUT FOR BALANCED DESIGN
     // Left Column
-    this.addButton('campaign', 260, 325, 360, 56, "BOSQICHLI REJIM (1-3)", () => { this.game.state = 'LEVEL_SELECT'; }, '#00ffcc');
+    this.addButton('campaign', 260, 325, 360, 56, "BOSQICHLI REJIM (1-100)", () => {
+      this.game.jumpToHighestLevelPage();
+      this.game.state = 'LEVEL_SELECT';
+    }, '#00ffcc');
     this.addButton('endless', 260, 395, 360, 52, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
     this.addButton('shop', 260, 460, 360, 52, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
 
@@ -299,57 +302,86 @@ class UIManager {
   }
 
   drawLevelSelect(ctx) {
-    ctx.fillStyle = 'rgba(8, 10, 20, 0.95)';
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.96)';
     ctx.fillRect(0, 0, 1280, 720);
 
-    ctx.fillStyle = '#00f0ff';
-    ctx.font = '28px "Press Start 2P", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText("BOSQICHLAR XARITASI (LEVEL SELECT)", 640, 80);
+    const page = this.game.levelSelectPage || 1;
+    const stages = StageDatabase.getStagesForPage(page);
+    const sector = StageDatabase.getSectorForStage((page - 1) * 10 + 1);
+    const unlocked = StorageManager.getUnlockedStages().map(Number);
+    const starsData = StorageManager.getStageStars();
+    const totalStars = StorageManager.getTotalStars();
 
-    ctx.fillStyle = '#8899aa';
-    ctx.font = '14px "Press Start 2P", monospace';
-    ctx.fillText("Har bir bosqichni muvaffaqiyatli yakunlab, keyingisini oching!", 640, 120);
+    // 1. Header & Total Stars
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '24px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText("BOSQICHLAR XARITASI (1-100 BOSQICH)", 640, 48);
+
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText(`JAMI YULDUZLAR: ${totalStars} / 300 ★`, 640, 75);
+
+    // 2. Sector Navigation Bar (Top)
+    const navY = 95;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+    ctx.fillRect(260, navY, 760, 42);
+    ctx.strokeStyle = sector.color;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(260, navY, 760, 42);
+
+    ctx.fillStyle = sector.color;
+    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.fillText(`SEKTOR ${page}/10: ${sector.name} (${(page - 1) * 10 + 1}-${page * 10}-BOSQICH)`, 640, navY + 26);
     ctx.textAlign = 'left';
 
-    const unlocked = StorageManager.getUnlockedStages();
-    const starsData = StorageManager.getStageStars();
+    // Sector Prev / Next Buttons
+    if (page > 1) {
+      this.addButton('stage_prev_page', 70, navY, 170, 42, "<< OLDINGI", () => {
+        this.game.prevLevelPage();
+      }, '#00f0ff');
+    }
 
-    const stages = [
-      { num: 1, name: 'NEON CITY', dist: '400m', desc: 'Kirish: Sakrash va yotib sirpanish', color: '#00f0ff' },
-      { num: 2, name: 'GRAVITY ANOMALY', dist: '600m', desc: 'Shiftda yugurish va lazer arralar', color: '#d844ff' },
-      { num: 3, name: 'CYBER MATRIX & BOSS', dist: 'BOSS', desc: 'Kiber Goliath dushmani jangi!', color: '#ff2255' }
-    ];
+    if (page < 10) {
+      this.addButton('stage_next_page', 1040, navY, 170, 42, "KEYINGI >>", () => {
+        this.game.nextLevelPage();
+      }, '#00f0ff');
+    }
 
+    // 3. 5x2 Grid of 10 Stages
     stages.forEach((st, idx) => {
-      const cardX = 140 + idx * 350;
-      const cardY = 180;
-      const cardW = 300;
-      const cardH = 380;
-      const isUnlocked = st.num === 1 || unlocked.map(Number).includes(Number(st.num));
+      const col = idx % 5;
+      const row = Math.floor(idx / 5);
 
-      ctx.fillStyle = isUnlocked ? 'rgba(15, 23, 42, 0.92)' : 'rgba(20, 20, 30, 0.6)';
+      const cardW = 216;
+      const cardH = 195;
+      const cardX = 66 + col * (cardW + 14);
+      const cardY = 155 + row * (cardH + 16);
+
+      const isUnlocked = st.num === 1 || unlocked.includes(st.num);
+
+      // Card Background & Border
+      ctx.fillStyle = isUnlocked ? (st.isBoss ? 'rgba(35, 12, 25, 0.92)' : 'rgba(15, 23, 42, 0.92)') : 'rgba(18, 20, 28, 0.6)';
       ctx.fillRect(cardX, cardY, cardW, cardH);
-      ctx.strokeStyle = isUnlocked ? st.color : '#444455';
-      ctx.lineWidth = 3;
+      ctx.strokeStyle = isUnlocked ? (st.isBoss ? '#ff0055' : st.color) : '#334155';
+      ctx.lineWidth = isUnlocked ? (st.isBoss ? 3 : 2) : 1;
       ctx.strokeRect(cardX, cardY, cardW, cardH);
 
-      ctx.fillStyle = isUnlocked ? st.color : '#666677';
-      ctx.font = '18px "Press Start 2P", monospace';
+      // Card Header
       ctx.textAlign = 'center';
-      ctx.fillText(`${st.num}-BOSQICH`, cardX + cardW / 2, cardY + 45);
-
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = isUnlocked ? (st.isBoss ? '#ff2266' : st.color) : '#64748b';
       ctx.font = '12px "Press Start 2P", monospace';
-      ctx.fillText(st.name, cardX + cardW / 2, cardY + 80);
+      ctx.fillText(st.isBoss ? `👑 ${st.num}-BOSQICH` : `${st.num}-BOSQICH`, cardX + cardW / 2, cardY + 26);
 
+      // Stage Title
+      ctx.fillStyle = isUnlocked ? '#ffffff' : '#64748b';
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.fillText(st.name, cardX + cardW / 2, cardY + 50);
+
+      // Target Distance
       ctx.fillStyle = '#88aacc';
-      ctx.font = '14px "Rajdhani", sans-serif';
-      ctx.fillText(st.desc, cardX + cardW / 2, cardY + 125);
-
-      ctx.fillStyle = '#ffd700';
-      ctx.font = '14px "Press Start 2P", monospace';
-      ctx.fillText(`Masofa: ${st.dist}`, cardX + cardW / 2, cardY + 175);
+      ctx.font = '11px "Press Start 2P", monospace';
+      ctx.fillText(st.isBoss ? `BOSS JANGI` : `${st.targetDistance} metr`, cardX + cardW / 2, cardY + 76);
 
       // Stars
       const starsEarned = starsData[st.num] || 0;
@@ -358,34 +390,46 @@ class UIManager {
         starsStr += s <= starsEarned ? '★ ' : '☆ ';
       }
       ctx.fillStyle = '#ffd700';
-      ctx.font = '22px "Press Start 2P", monospace';
-      ctx.fillText(starsStr, cardX + cardW / 2, cardY + 230);
+      ctx.font = '15px "Press Start 2P", monospace';
+      ctx.fillText(starsStr.trim(), cardX + cardW / 2, cardY + 112);
 
       if (isUnlocked) {
-        // Entire card is clickable to launch stage
+        // Transparent click overlay for whole card
         this.addButton(`card_stage_${st.num}`, cardX, cardY, cardW, cardH, '', () => {
           this.game.startStage(st.num);
         }, 'transparent');
 
-        this.addButton(`stage_${st.num}`, cardX + 30, cardY + 290, 240, 50, "BOSHLASH", () => {
+        // Visible button at bottom of card
+        this.addButton(`stage_${st.num}`, cardX + 18, cardY + 142, cardW - 36, 38, "BOSHLASH", () => {
           this.game.startStage(st.num);
-        }, st.color);
+        }, st.isBoss ? '#ff0055' : st.color);
       } else {
-        ctx.fillStyle = '#888899';
-        ctx.font = '12px "Press Start 2P", monospace';
-        ctx.fillText("QULFLANGAN 🔒", cardX + cardW / 2, cardY + 320);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.fillText("QULFLANGAN 🔒", cardX + cardW / 2, cardY + 162);
       }
     });
 
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
-    ctx.font = '12px "Press Start 2P", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText("Boshlash: Kartochkani bosing | Klaviatura: [1], [2], [3] yoki [SPACE]", 640, 675);
-
-    ctx.textAlign = 'left';
-    this.addButton('ls_back', 520, 595, 240, 48, "ASOSIY MENYU", () => {
+    // 4. Bottom Actions
+    this.addButton('ls_back', 66, 595, 230, 48, "ASOSIY MENYU", () => {
       this.game.state = 'MENU';
     }, '#00f0ff');
+
+    this.addButton('ls_jump_highest', 316, 595, 450, 48, "SO'NGGI OCHILGANGA O'TISH", () => {
+      this.game.jumpToHighestLevelPage();
+    }, '#ffd700');
+
+    const highestUnlocked = StorageManager.getHighestUnlockedStage();
+    this.addButton('ls_start_highest', 786, 595, 428, 48, `O'YNASH (${highestUnlocked}-BOSQICH) >>`, () => {
+      this.game.startStage(highestUnlocked);
+    }, '#00ffcc');
+
+    // Bottom Navigation Hint
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.55)';
+    ctx.font = '11px "Rajdhani", sans-serif';
+    ctx.fillText("Klaviaturada: ← / → sahifa almashtirish  |  [SPACE] / [ENTER]: Boshlash  |  ESC: Menyuga qaytish", 640, 672);
+    ctx.textAlign = 'left';
   }
 
   drawQuestsModal(ctx) {
@@ -575,15 +619,15 @@ class UIManager {
     ctx.fillText(`Yig'ilgan tangalar: ${this.game.coins}`, 640, 350);
     ctx.textAlign = 'left';
 
-    if (this.game.currentStage < 3) {
-      this.addButton('stage_next', 460, 410, 360, 50, "KEYINGI BOSQICH >>", () => {
+    if (this.game.currentStage < 100) {
+      this.addButton('stage_next', 460, 410, 360, 50, `KEYINGI BOSQICH (${this.game.currentStage + 1}) >>`, () => {
         this.game.startStage(this.game.currentStage + 1);
       }, '#00ffcc');
     } else {
       ctx.fillStyle = '#ffd700';
       ctx.font = '16px "Press Start 2P", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText("TABRIKLAYMIZ! O'YIN TO'LIQ YUTILD!", 640, 430);
+      ctx.fillText("★ TABRIKLAYMIZ! BARCHA 100 TA BOSQICH YUTILDI! ★", 640, 430);
       ctx.textAlign = 'left';
     }
 

@@ -19,9 +19,10 @@ class Game {
     this.coins = 0;
     this.isNewRecord = false;
 
-    // Game Mode & Stage Progression
+    // Game Mode & Stage Progression (1-100 Stages)
     this.gameMode = 'campaign'; // 'campaign' or 'endless'
     this.currentStage = 1;
+    this.levelSelectPage = 1;
     this.stageBonus = 0;
 
     // Game state: MENU, LEVEL_SELECT, PLAYING, PAUSED, STAGE_CLEAR, GAMEOVER, SHOP, PETS, QUESTS, SETTINGS
@@ -64,9 +65,8 @@ class Game {
   }
 
   getStageTarget(stageNum) {
-    if (stageNum === 1) return 400;
-    if (stageNum === 2) return 600;
-    return 800; // Stage 3 target before / during boss
+    const s = StageDatabase.getStage(stageNum);
+    return s ? s.targetDistance : 400;
   }
 
   loadBackgrounds() {
@@ -90,22 +90,41 @@ class Game {
       AudioSys.init();
       AudioSys.resume();
 
-      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Enter') {
+      if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'Enter') {
         e.preventDefault();
         if (this.state === 'PLAYING') {
           this.player.jump();
         } else if (this.state === 'MENU') {
+          this.jumpToHighestLevelPage();
           this.state = 'LEVEL_SELECT';
         } else if (this.state === 'LEVEL_SELECT') {
-          this.startStage(1);
+          const page = this.levelSelectPage || 1;
+          const stages = StageDatabase.getStagesForPage(page);
+          const unlocked = StorageManager.getUnlockedStages().map(Number);
+          const playable = stages.filter(s => s.num === 1 || unlocked.includes(s.num));
+          const targetStage = playable.length > 0 ? playable[playable.length - 1].num : 1;
+          this.startStage(targetStage);
         } else if (this.state === 'GAMEOVER') {
           if (this.gameMode === 'campaign') this.startStage(this.currentStage);
           else this.startEndlessGame();
         } else if (this.state === 'STAGE_CLEAR') {
-          if (this.currentStage < 3) this.startStage(this.currentStage + 1);
+          if (this.currentStage < 100) this.startStage(this.currentStage + 1);
           else this.state = 'LEVEL_SELECT';
         } else if (this.state === 'PAUSED') {
           this.resumeGame();
+        }
+      }
+
+      if (e.code === 'ArrowLeft') {
+        if (this.state === 'LEVEL_SELECT') {
+          e.preventDefault();
+          this.prevLevelPage();
+        }
+      }
+      if (e.code === 'ArrowRight') {
+        if (this.state === 'LEVEL_SELECT') {
+          e.preventDefault();
+          this.nextLevelPage();
         }
       }
 
@@ -261,32 +280,44 @@ class Game {
     }
   }
 
+  nextLevelPage() {
+    this.levelSelectPage = Math.min(10, (this.levelSelectPage || 1) + 1);
+    AudioSys.playSFX('click');
+  }
+
+  prevLevelPage() {
+    this.levelSelectPage = Math.max(1, (this.levelSelectPage || 1) - 1);
+    AudioSys.playSFX('click');
+  }
+
+  jumpToHighestLevelPage() {
+    const highest = StorageManager.getHighestUnlockedStage();
+    this.levelSelectPage = Math.min(10, Math.floor((highest - 1) / 10) + 1);
+    AudioSys.playSFX('powerup');
+  }
+
   startStage(stageNum) {
     this.gameMode = 'campaign';
-    this.currentStage = stageNum;
+    this.currentStage = Math.max(1, Math.min(100, parseInt(stageNum, 10) || 1));
     this.resetGame();
 
-    if (stageNum === 1) {
-      this.baseSpeed = 380;
-      this.spawner.minInterval = 1.6;
-      this.spawner.maxInterval = 2.4;
-      this.weatherSys.currentWeather = 'CLEAR';
-    } else if (stageNum === 2) {
-      this.baseSpeed = 440;
-      this.spawner.minInterval = 1.3;
-      this.spawner.maxInterval = 1.9;
-      this.weatherSys.currentWeather = 'RAIN';
-    } else if (stageNum === 3) {
-      this.baseSpeed = 500;
-      this.spawner.minInterval = 1.2;
-      this.spawner.maxInterval = 1.8;
-      this.weatherSys.currentWeather = 'CYBER_STORM';
-    }
+    const stageData = StageDatabase.getStage(this.currentStage);
+    const secIdx = stageData.sectorId;
 
+    // Difficulty curve scaling per sector (1 to 10)
+    this.baseSpeed = 380 + Math.min(240, Math.floor((this.currentStage - 1) / 10) * 24);
+    this.spawner.minInterval = Math.max(0.85, 1.6 - (secIdx - 1) * 0.07);
+    this.spawner.maxInterval = Math.max(1.3, 2.4 - (secIdx - 1) * 0.08);
+
+    // Dynamic weather matching sector
+    const weatherMap = ['CLEAR', 'RAIN', 'CLEAR', 'SNOW', 'CYBER_STORM', 'SNOW', 'RAIN', 'CLEAR', 'CYBER_STORM', 'CYBER_STORM'];
+    this.weatherSys.currentWeather = weatherMap[secIdx - 1] || 'CLEAR';
+
+    // If it's a boss stage, the boss will activate when reaching targetDistance
     this.state = 'PLAYING';
     AudioSys.startBGM();
     AudioSys.playSFX('powerup');
-    ParticleSys.addFloatingText(640, 240, `${stageNum}-BOSQICH BOSHLANDI!`, '#00f0ff', 24);
+    ParticleSys.addFloatingText(640, 240, `${this.currentStage}-BOSQICH BOSHLANDI!`, '#00f0ff', 24);
   }
 
   startEndlessGame() {
@@ -328,13 +359,17 @@ class Game {
     AudioSys.playSFX('quest_complete');
     CameraSys.addTrauma(0.5);
 
-    this.stageBonus = this.currentStage * 120;
+    const stageData = StageDatabase.getStage(this.currentStage);
+    this.stageBonus = stageData ? stageData.coinBonus : (this.currentStage * 15);
     StorageManager.addCoins(this.coins + this.stageBonus);
     StorageManager.saveStageStars(this.currentStage, 3);
-    StorageManager.unlockStage(this.currentStage + 1);
+    if (this.currentStage < 100) {
+      StorageManager.unlockStage(this.currentStage + 1);
+    }
 
     ParticleSys.addShockwave(640, 360, '#00ffcc');
-    ParticleSys.addFloatingText(640, 280, '★ STAGE COMPLETE! ★', '#00ffcc', 28);
+    const clearText = this.currentStage >= 100 ? '★ 100-BOSQICH G\'ALABASI! ★' : `★ ${this.currentStage}-BOSQICH YAKUNLANDI! ★`;
+    ParticleSys.addFloatingText(640, 280, clearText, '#00ffcc', 26);
   }
 
   pauseGame() {
@@ -381,12 +416,22 @@ class Game {
     // Daily Quests distance progression
     this.dailyQuests.onDistance(frameDist);
 
-    // Stage 1 & 2 Completion Check
+    // Stage Completion Check (Campaign Mode 1-100)
     if (this.gameMode === 'campaign') {
-      const target = this.getStageTarget(this.currentStage);
-      if (this.currentStage < 3 && this.distance >= target) {
-        this.completeCurrentStage();
-        return;
+      const stageData = StageDatabase.getStage(this.currentStage);
+      const target = stageData ? stageData.targetDistance : 400;
+
+      if (stageData && stageData.isBoss) {
+        // Milestone Boss Stage: trigger boss at target distance
+        if (this.distance >= target && !this.boss.active && this.boss.state !== 'defeated') {
+          this.boss.activate(stageData.boss.name, stageData.boss.hp);
+        }
+      } else {
+        // Standard Stage: clear stage when target distance is reached
+        if (this.distance >= target) {
+          this.completeCurrentStage();
+          return;
+        }
       }
     }
 

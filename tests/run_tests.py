@@ -23,6 +23,7 @@ json_files = [
     ("data/items/items.json", ["skins", "powerups"]),
     ("data/enemies/hazards.json", ["hazards"]),
     ("data/levels/speed_curve.json", ["base_speed", "acceleration_rate"]),
+    ("data/levels/stages.json", ["total_stages", "stages"]),
     ("data/quests/achievements.json", ["achievements"])
 ]
 
@@ -85,6 +86,7 @@ for cs in core_scenes:
 web_scripts = [
     "js/audio.js",
     "js/storage.js",
+    "js/stages.js",
     "js/particles.js",
     "js/weather.js",
     "js/pet.js",

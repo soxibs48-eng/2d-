@@ -35,23 +35,29 @@ const StorageManager = {
     return false;
   },
 
-  // STAGE PROGRESSION
+  // STAGE PROGRESSION (1-100 STAGES)
   getUnlockedStages() {
     const s = localStorage.getItem('pixel_runner_unlocked_stages');
     return s ? JSON.parse(s) : [1];
   },
 
   unlockStage(stageNum) {
-    const stages = this.getUnlockedStages();
+    if (stageNum > 100) return;
+    const stages = this.getUnlockedStages().map(Number);
     if (!stages.includes(stageNum)) {
       stages.push(stageNum);
       localStorage.setItem('pixel_runner_unlocked_stages', JSON.stringify(stages));
     }
   },
 
+  getHighestUnlockedStage() {
+    const stages = this.getUnlockedStages().map(Number);
+    return stages.length > 0 ? Math.max(...stages) : 1;
+  },
+
   getStageStars() {
     const s = localStorage.getItem('pixel_runner_stage_stars');
-    return s ? JSON.parse(s) : { 1: 0, 2: 0, 3: 0 };
+    return s ? JSON.parse(s) : { 1: 0 };
   },
 
   saveStageStars(stageNum, stars) {
@@ -60,6 +66,15 @@ const StorageManager = {
       data[stageNum] = stars;
       localStorage.setItem('pixel_runner_stage_stars', JSON.stringify(data));
     }
+  },
+
+  getTotalStars() {
+    const data = this.getStageStars();
+    let total = 0;
+    for (const key in data) {
+      total += parseInt(data[key], 10) || 0;
+    }
+    return total;
   },
 
   // SKINS

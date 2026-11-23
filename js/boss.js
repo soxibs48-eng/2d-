@@ -17,15 +17,18 @@ class CyberBoss {
     
     this.time = 0;
     this.attackTimer = 2.8;
+    this.name = 'Cyber Goliath';
     this.attackCooldown = 3.2;
     this.missiles = [];
     this.state = 'entering'; // entering, fighting, defeated
     this.flashTimer = 0;
   }
 
-  activate() {
-    this.active = true;
+  activate(bossName = 'Cyber Goliath', maxHp = 100) {
+    this.name = bossName;
+    this.maxHp = maxHp;
     this.hp = this.maxHp;
+    this.active = true;
     this.x = 1350;
     this.y = 360;
     this.state = 'entering';
@@ -33,7 +36,7 @@ class CyberBoss {
     this.attackTimer = 2.0;
     AudioSys.playSFX('powerup');
     CameraSys.addTrauma(0.6);
-    ParticleSys.addFloatingText(640, 260, '⚠ BOSS ALERT: CYBER GOLIATH ⚠', '#ff0055', 20);
+    ParticleSys.addFloatingText(640, 260, `⚠ BOSS ALERT: ${this.name.toUpperCase()} ⚠`, '#ff0055', 20);
   }
 
   deactivate() {
@@ -261,7 +264,7 @@ class CyberBoss {
     ctx.fillStyle = '#ff0055';
     ctx.font = '11px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('BOSS: CYBER GOLIATH', 640, barY - 6);
+    ctx.fillText(`BOSS: ${(this.name || 'CYBER GOLIATH').toUpperCase()}`, 640, barY - 6);
 
     // Health Fill
     const pct = this.hp / this.maxHp;
@@ -272,7 +275,7 @@ class CyberBoss {
 
     ctx.fillStyle = '#ffffff';
     ctx.font = '9px "Press Start 2P", monospace';
-    ctx.fillText(`${Math.round(this.hp)}%`, 640, barY + 13);
+    ctx.fillText(`${Math.round(this.hp)} / ${this.maxHp} HP (${Math.round(pct * 100)}%)`, 640, barY + 13);
     ctx.restore();
   }
 }
