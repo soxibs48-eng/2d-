@@ -48,6 +48,9 @@ class Game {
       double: 0
     };
 
+    // On-screen introductory controls guide timer (seconds)
+    this.introGuideTimer = 6.0;
+
     // Parallax background layers
     this.bgOffsets = {
       sky: 0,
@@ -97,6 +100,8 @@ class Game {
         } else if (this.state === 'MENU') {
           this.jumpToHighestLevelPage();
           this.state = 'LEVEL_SELECT';
+        } else if (this.state === 'CONTROLS_GUIDE') {
+          this.startStage(1);
         } else if (this.state === 'LEVEL_SELECT') {
           const page = this.levelSelectPage || 1;
           const stages = StageDatabase.getStagesForPage(page);
@@ -112,6 +117,13 @@ class Game {
           else this.state = 'LEVEL_SELECT';
         } else if (this.state === 'PAUSED') {
           this.resumeGame();
+        }
+      }
+
+      if (e.code === 'ArrowUp') {
+        e.preventDefault();
+        if (this.state === 'PLAYING') {
+          this.player.jump();
         }
       }
 
@@ -175,7 +187,7 @@ class Game {
           this.pauseGame();
         } else if (this.state === 'PAUSED') {
           this.resumeGame();
-        } else if (['LEVEL_SELECT', 'SHOP', 'PETS', 'QUESTS', 'SETTINGS'].includes(this.state)) {
+        } else if (['LEVEL_SELECT', 'SHOP', 'PETS', 'QUESTS', 'SETTINGS', 'CONTROLS_GUIDE'].includes(this.state)) {
           this.state = 'MENU';
         }
       }
@@ -187,50 +199,61 @@ class Game {
       }
     });
 
-    // Touch controls
+    // Touch and On-Screen Click Controls
     const jumpBtn = document.getElementById('touch-jump');
     const slideBtn = document.getElementById('touch-slide');
     const flipBtn = document.getElementById('touch-flip');
     const dashBtn = document.getElementById('touch-dash');
 
     if (jumpBtn) {
-      jumpBtn.addEventListener('touchstart', (e) => {
+      const doJump = (e) => {
         e.preventDefault();
         AudioSys.init();
         if (this.state === 'PLAYING') this.player.jump();
         else if (this.state === 'MENU') this.state = 'LEVEL_SELECT';
+        else if (this.state === 'CONTROLS_GUIDE') this.startStage(1);
         else if (this.state === 'LEVEL_SELECT') this.startStage(1);
-      });
+      };
+      jumpBtn.addEventListener('touchstart', doJump);
+      jumpBtn.addEventListener('mousedown', doJump);
     }
 
     if (slideBtn) {
-      slideBtn.addEventListener('touchstart', (e) => {
+      const startSlide = (e) => {
         e.preventDefault();
         if (this.state === 'PLAYING') this.player.startSlide();
-      });
-      slideBtn.addEventListener('touchend', (e) => {
+      };
+      const stopSlide = (e) => {
         e.preventDefault();
         this.player.stopSlide();
-      });
+      };
+      slideBtn.addEventListener('touchstart', startSlide);
+      slideBtn.addEventListener('touchend', stopSlide);
+      slideBtn.addEventListener('mousedown', startSlide);
+      slideBtn.addEventListener('mouseup', stopSlide);
     }
 
     if (dashBtn) {
-      dashBtn.addEventListener('touchstart', (e) => {
+      const doDash = (e) => {
         e.preventDefault();
         if (this.state === 'PLAYING') this.player.dash();
-      });
+      };
+      dashBtn.addEventListener('touchstart', doDash);
+      dashBtn.addEventListener('mousedown', doDash);
     }
 
     if (flipBtn) {
-      flipBtn.addEventListener('touchstart', (e) => {
+      const doFlip = (e) => {
         e.preventDefault();
         if (this.state === 'PLAYING' && (this.timers.gravity > 0 || this.player.isHyper)) {
           this.player.flipGravity();
         }
-      });
+      };
+      flipBtn.addEventListener('touchstart', doFlip);
+      flipBtn.addEventListener('mousedown', doFlip);
     }
 
-    const handleInputPos = (clientX, clientY) => {
+    const handleInputPos = (clientX, clientY, isRightClick = false) => {
       if (clientX === undefined || clientY === undefined) return;
       AudioSys.init();
       AudioSys.resume();
@@ -239,22 +262,41 @@ class Game {
       const scaleY = this.canvas.height / rect.height;
       const x = (clientX - rect.left) * scaleX;
       const y = (clientY - rect.top) * scaleY;
-      this.ui.handleClick(x, y);
+      const handled = this.ui.handleClick(x, y);
+      
+      // If clicking directly on screen during gameplay (and not clicking Pause button):
+      if (!handled && this.state === 'PLAYING') {
+        if (isRightClick) {
+          this.player.startSlide();
+          setTimeout(() => this.player.stopSlide(), 450);
+        } else {
+          // ANY tap or left click on the screen makes the player JUMP! (2x/3x in air)
+          this.player.jump();
+        }
+      }
     };
 
     this.canvas.addEventListener('click', (e) => {
-      handleInputPos(e.clientX, e.clientY);
+      handleInputPos(e.clientX, e.clientY, e.button === 2);
+    });
+
+    this.canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      if (this.state === 'PLAYING') {
+        this.player.startSlide();
+        setTimeout(() => this.player.stopSlide(), 450);
+      }
     });
 
     this.canvas.addEventListener('pointerdown', (e) => {
       if (e.pointerType === 'touch' || e.pointerType === 'pen') {
-        handleInputPos(e.clientX, e.clientY);
+        handleInputPos(e.clientX, e.clientY, false);
       }
     });
 
     this.canvas.addEventListener('touchstart', (e) => {
       if (e.touches && e.touches.length > 0) {
-        handleInputPos(e.touches[0].clientX, e.touches[0].clientY);
+        handleInputPos(e.touches[0].clientX, e.touches[0].clientY, false);
       }
     }, { passive: true });
 
@@ -351,6 +393,7 @@ class Game {
     this.boss.reset();
     CameraSys.reset();
     ParticleSys.reset();
+    this.introGuideTimer = 6.0;
   }
 
   completeCurrentStage() {
@@ -409,6 +452,10 @@ class Game {
     this.weatherSys.update(delta);
 
     if (this.state !== 'PLAYING') return;
+
+    if (this.introGuideTimer > 0) {
+      this.introGuideTimer -= delta;
+    }
 
     const frameDist = (this.gameSpeed * delta) / 10;
     this.distance += frameDist;

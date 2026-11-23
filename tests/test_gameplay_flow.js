@@ -104,6 +104,17 @@ const state1 = vm.runInContext('game.state;', context);
 console.log(`[TEST] Initial state: ${state1} (Expected: MENU)`);
 if (state1 !== 'MENU') throw new Error('Initial state is not MENU');
 
+// Step 0: Test "QANDAY O'YNASH KERAK? (BOSHQARUV)" modal
+console.log('[TEST] Testing "QANDAY O\'YNASH KERAK?" button at (500, 520)...');
+vm.runInContext('game.ui.draw(game.ctx);', context);
+const clickedGuide = vm.runInContext('game.ui.handleClick(500, 520);', context);
+const stateGuide = vm.runInContext('game.state;', context);
+console.log(`[TEST] Click handled: ${clickedGuide}, State: ${stateGuide} (Expected: CONTROLS_GUIDE)`);
+if (stateGuide !== 'CONTROLS_GUIDE') throw new Error('Did not transition to CONTROLS_GUIDE');
+
+// Return to MENU
+vm.runInContext('game.state = "MENU";', context);
+
 // Step 1: Click "BOSQICHLI REJIM (1-100)"
 console.log('[TEST] Drawing UI and clicking "BOSQICHLI REJIM (1-100)" at (300, 350)...');
 vm.runInContext('game.ui.draw(game.ctx);', context);

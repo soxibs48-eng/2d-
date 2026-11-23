@@ -99,6 +99,9 @@ class UIManager {
       case 'SETTINGS':
         this.drawSettings(ctx);
         break;
+      case 'CONTROLS_GUIDE':
+        this.drawControlsGuide(ctx);
+        break;
     }
 
     this.renderButtons(ctx);
@@ -238,10 +241,105 @@ class UIManager {
       this.drawBadge(ctx, badgeX, badgeY, this.doubleIcon, `${this.game.timers.double.toFixed(1)}s`, '#ffd700');
     }
 
-    // Controls hints on bottom
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-    ctx.font = '13px "Rajdhani", sans-serif';
-    ctx.fillText('SPACE/W: 2x Sakrash (Double Jump)  |  S (Ushlab turish): Yotish/Sirpanish  |  E: Dash  |  SHIFT/F: Flip', 30, 705);
+    // 6. INTRO CONTROLS TUTORIAL OVERLAY (Prominently visible when entering/starting)
+    if (this.game.introGuideTimer > 0) {
+      const alpha = Math.min(1.0, this.game.introGuideTimer / 0.8);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      const bannerX = 220;
+      const bannerY = 86;
+      const bannerW = 840;
+      const bannerH = 175;
+
+      ctx.fillStyle = 'rgba(8, 14, 28, 0.94)';
+      ctx.fillRect(bannerX, bannerY, bannerW, bannerH);
+      ctx.strokeStyle = '#00f0ff';
+      ctx.lineWidth = 2.5;
+      ctx.strokeRect(bannerX, bannerY, bannerW, bannerH);
+
+      // Title
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = '14px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText("🕹️ QANDAY O'YNASH KERAK? (BOSHQARUV)", bannerX + bannerW / 2, bannerY + 30);
+
+      // Row 1: SAKRASH (JUMP)
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#00ffcc';
+      ctx.font = '11px "Press Start 2P", monospace';
+      ctx.fillText("⬆️ SAKRASH:", bannerX + 25, bannerY + 68);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '15px "Rajdhani", sans-serif';
+      ctx.fillText("[SPACE] / [W] / [↑] yoki EKRANNI BOSING  (Havoda yana bossangiz: 2X/3X sakraydi!)", bannerX + 165, bannerY + 67);
+
+      // Row 2: YOTISH (SLIDE)
+      ctx.fillStyle = '#ffaa00';
+      ctx.font = '11px "Press Start 2P", monospace';
+      ctx.fillText("⬇️ YOTISH:", bannerX + 25, bannerY + 102);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '15px "Rajdhani", sans-serif';
+      ctx.fillText("[S] / [↓] (ushlab turing) yoki o'ngdagi [SLIDE]  (Pastki to'siqlar ostidan sirpanish)", bannerX + 165, bannerY + 101);
+
+      // Row 3: DASH & FLIP
+      ctx.fillStyle = '#00e5ff';
+      ctx.font = '11px "Press Start 2P", monospace';
+      ctx.fillText("⚡ DASH:", bannerX + 25, bannerY + 136);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '15px "Rajdhani", sans-serif';
+      ctx.fillText("[E] yoki [D]  |  🔄 FLIP GRAVITATSIYA: [F] yoki [SHIFT] (Shiftda teskari yugurish)", bannerX + 165, bannerY + 135);
+
+      // Disappear timer hint
+      ctx.fillStyle = 'rgba(0, 240, 255, 0.65)';
+      ctx.font = '12px "Rajdhani", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Bu yo'riqnoma ${Math.ceil(this.game.introGuideTimer)}s dan keyin avtomatik yopiladi`, bannerX + bannerW / 2, bannerY + 163);
+
+      // Bouncing glowing arrow above the hero
+      if (this.game.player && this.game.introGuideTimer > 1.2) {
+        const bounce = Math.sin(performance.now() * 0.008) * 8;
+        const arrowX = this.game.player.x + 18;
+        const arrowY = (this.game.player.isInverted ? this.game.player.y + 75 : this.game.player.y - 36) + bounce;
+
+        ctx.fillStyle = '#00ffcc';
+        ctx.font = '11px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = '#00ffcc';
+        ctx.shadowBlur = 12;
+        ctx.fillText("⬆️ SAKRASH (SPACE / TAP)!", arrowX, arrowY - 14);
+        ctx.font = '20px "Press Start 2P", monospace';
+        ctx.fillText("▼", arrowX, arrowY);
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.restore();
+    }
+
+    // 7. BOTTOM CONTROLS HUD (Always visible, clean glass badges)
+    ctx.fillStyle = 'rgba(8, 12, 24, 0.9)';
+    ctx.fillRect(0, 672, 1280, 48);
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 672, 1280, 1);
+
+    const p1 = { x: 25, y: 678, w: 345, h: 36, col: '#00ffcc', t: '🟢 [SPACE / W / BOSISH] SAKRASH (2X)' };
+    const p2 = { x: 385, y: 678, w: 295, h: 36, col: '#ffaa00', t: '🟡 [S / ↓] YOTISH (SLIDE)' };
+    const p3 = { x: 695, y: 678, w: 235, h: 36, col: '#00e5ff', t: '🔵 [E] DASH (TEZLIK)' };
+    const p4 = { x: 945, y: 678, w: 310, h: 36, col: '#d844ff', t: '🟣 [F / SHIFT] FLIP GRAVITI' };
+
+    [p1, p2, p3, p4].forEach(p => {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(p.x, p.y, p.w, p.h);
+      ctx.strokeStyle = p.col;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+      ctx.fillStyle = p.col;
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(p.t, p.x + p.w / 2, p.y + 22);
+    });
+    ctx.textAlign = 'left';
   }
 
   drawBadge(ctx, x, y, icon, label, color) {
@@ -268,36 +366,45 @@ class UIManager {
     ctx.textAlign = 'center';
     ctx.shadowColor = '#00f0ff';
     ctx.shadowBlur = 24;
-    ctx.fillText('PIXEL RUNNER', 640, 175);
+    ctx.fillText('PIXEL RUNNER', 640, 160);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ff2288';
     ctx.font = '16px "Press Start 2P", monospace';
-    ctx.fillText('— ANTI-GRAVITY PROTOCOL (v3.0) —', 640, 225);
+    ctx.fillText('— ANTI-GRAVITY PROTOCOL (v3.0) —', 640, 210);
 
     ctx.fillStyle = '#8899aa';
     ctx.font = '12px "Press Start 2P", monospace';
-    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 275);
+    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 255);
     ctx.textAlign = 'left';
 
     // 2-COLUMN BUTTON LAYOUT FOR BALANCED DESIGN
     // Left Column
-    this.addButton('campaign', 260, 325, 360, 56, "BOSQICHLI REJIM (1-100)", () => {
+    this.addButton('campaign', 260, 315, 360, 54, "BOSQICHLI REJIM (1-100)", () => {
       this.game.jumpToHighestLevelPage();
       this.game.state = 'LEVEL_SELECT';
     }, '#00ffcc');
-    this.addButton('endless', 260, 395, 360, 52, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
-    this.addButton('shop', 260, 460, 360, 52, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
+    this.addButton('endless', 260, 380, 360, 48, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
+    this.addButton('shop', 260, 438, 360, 48, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
 
     // Right Column
-    this.addButton('quests', 660, 325, 360, 56, "KUNLIK VAZIFALAR 🏆", () => { this.game.state = 'QUESTS'; }, '#00f0ff');
-    this.addButton('pets', 660, 395, 360, 52, "HAMROHLAR (PETS) 🤖", () => { this.game.state = 'PETS'; }, '#00ffaa');
-    this.addButton('settings', 660, 460, 360, 52, "SOZLAMALAR ⚙️", () => { this.game.state = 'SETTINGS'; }, '#00b0ff');
+    this.addButton('quests', 660, 315, 360, 54, "KUNLIK VAZIFALAR 🏆", () => { this.game.state = 'QUESTS'; }, '#00f0ff');
+    this.addButton('pets', 660, 380, 360, 48, "HAMROHLAR (PETS) 🤖", () => { this.game.state = 'PETS'; }, '#00ffaa');
+    this.addButton('settings', 660, 438, 360, 48, "SOZLAMALAR ⚙️", () => { this.game.state = 'SETTINGS'; }, '#00b0ff');
 
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.6)';
+    // CENTER PROMINENT HOW-TO-PLAY BUTTON
+    this.addButton('how_to_play', 410, 502, 460, 52, "QANDAY O'YNASH KERAK? 🕹️", () => {
+      this.game.state = 'CONTROLS_GUIDE';
+    }, '#ff00aa');
+
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.75)';
     ctx.font = '12px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText("Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE]", 640, 560);
+    ctx.fillText("Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE] / [ENTER]", 640, 585);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.font = '14px "Rajdhani", sans-serif';
+    ctx.fillText("O'yinda sakrash uchun: [SPACE], [W], [↑] yoki ekranni bosing! Yotish uchun: [S]", 640, 615);
     ctx.textAlign = 'left';
   }
 
@@ -426,9 +533,12 @@ class UIManager {
 
     // Bottom Navigation Hint
     ctx.textAlign = 'center';
+    ctx.fillStyle = '#00ffcc';
+    ctx.font = '12px "Rajdhani", sans-serif';
+    ctx.fillText("💡 QAYERNI BOSISH KERAK: O'yinda [SPACE], [W] yoki Ekranni bosib sakraysiz (2x/3x)! Pastdagi [S] bilan yotasiz.", 640, 662);
     ctx.fillStyle = 'rgba(0, 240, 255, 0.55)';
     ctx.font = '11px "Rajdhani", sans-serif';
-    ctx.fillText("Klaviaturada: ← / → sahifa almashtirish  |  [SPACE] / [ENTER]: Boshlash  |  ESC: Menyuga qaytish", 640, 672);
+    ctx.fillText("Klaviaturada: ← / → sahifa almashtirish  |  [SPACE] / [ENTER]: Boshlash  |  ESC: Menyuga qaytish", 640, 682);
     ctx.textAlign = 'left';
   }
 
@@ -857,6 +967,130 @@ class UIManager {
     }, '#00ffcc');
 
     this.addButton('settings_back', 520, 490, 240, 44, 'ORTGA', () => { this.game.state = 'MENU'; }, '#00f0ff');
+  }
+
+  drawControlsGuide(ctx) {
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.96)';
+    ctx.fillRect(0, 0, 1280, 720);
+
+    // Modal frame
+    const mx = 90;
+    const my = 35;
+    const mw = 1100;
+    const mh = 650;
+
+    ctx.fillStyle = 'rgba(12, 18, 35, 0.95)';
+    ctx.fillRect(mx, my, mw, mh);
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(mx, my, mw, mh);
+
+    // Header
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '22px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 14;
+    ctx.fillText("🕹️ QANDAY O'YNASH KERAK? (BOSHQARUV)", 640, 80);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '11px "Press Start 2P", monospace';
+    ctx.fillText("PIXEL RUNNER: ANTI-GRAVITY PROTOCOL — TO'LIQ QO'LLANMA", 640, 110);
+
+    // 4 Cards in 2x2 Grid
+    const cards = [
+      {
+        x: 120, y: 135, w: 510, h: 220,
+        title: "⬆️ SAKRASH (JUMP) — 2X / 3X",
+        color: "#00ffcc",
+        keys: "[SPACE]  |  [W]  |  [↑]  |  EKRANNI BOSISH",
+        desc: [
+          "• YERDA: Qahramon to'siqlar ustidan baland sakraydi.",
+          "• HAVODA: Yana 1 marta bossangiz 2X DOUBLE JUMP qiladi!",
+          "• HYPER REJIMI: Ketma-ket 3X TRIPLE JUMP sakraydi!",
+          "• Mobil / Sichqoncha: Ekranning istalgan joyini bosing!"
+        ]
+      },
+      {
+        x: 650, y: 135, w: 510, h: 220,
+        title: "⬇️ YOTISH / SIRPANISH (SLIDE)",
+        color: "#ffaa00",
+        keys: "[S]  |  [↓]  |  O'NG TUGMA  |  [SLIDE]",
+        desc: [
+          "• BOSISH: Qahramon yerga yotib oldinga sirpanadi.",
+          "• USHLAB TURISH: Tugmani qo'yib yubormaguncha yotib yuradi.",
+          "• MAQSAD: Baland kiber-to'siqlar, lazerlar va uchuvchi",
+          "  minalar ostidan xavfsiz emaklab o'tish uchun zarur!"
+        ]
+      },
+      {
+        x: 120, y: 375, w: 510, h: 205,
+        title: "⚡ KIBER-DASH (TEZLANISH)",
+        color: "#00e5ff",
+        keys: "[E]  |  [D]  |  EKRANDAGI [DASH]",
+        desc: [
+          "• EFFEKT: Bir lahzada oldinga kuchli kiber-otilish!",
+          "• TO'SIQLARNI YORISH: Yo'lidagi to'siqlarni sindirib o'tadi",
+          "  va qo'shimcha +50 ball / tanga keltiradi!",
+          "• Qayta tiklanish (Cooldown): 3.5 soniya."
+        ]
+      },
+      {
+        x: 650, y: 375, w: 510, h: 205,
+        title: "🔄 FLIP (GRAVITATSIYANI BURISH)",
+        color: "#d844ff",
+        keys: "[F]  |  [SHIFT]  |  EKRANDAGI [FLIP]",
+        desc: [
+          "• EFFEKT: Gravitatsiya yo'nalishi bir zumda teskari aylanadi!",
+          "• SHIFTDA YUGURISH: Pol o'rniga shift bo'ylab yugurasiz.",
+          "• QACHON ISHLAYDI: Binafsharang portal yoki gravitatsiya",
+          "  bonusi olinganda yoki Fever/Hyper rejimida faollashadi!"
+        ]
+      }
+    ];
+
+    cards.forEach(c => {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(c.x, c.y, c.w, c.h);
+      ctx.strokeStyle = c.color;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(c.x, c.y, c.w, c.h);
+
+      // Card Title
+      ctx.fillStyle = c.color;
+      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(c.title, c.x + 20, c.y + 32);
+
+      // Keys Box
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.fillRect(c.x + 20, c.y + 44, c.w - 40, 26);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(c.x + 20, c.y + 44, c.w - 40, 26);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '11px "Press Start 2P", monospace';
+      ctx.fillText(c.keys, c.x + 30, c.y + 62);
+
+      // Bullet points
+      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.fillStyle = '#cbd5e1';
+      c.desc.forEach((line, lidx) => {
+        ctx.fillText(line, c.x + 20, c.y + 96 + lidx * 24);
+      });
+    });
+
+    // Bottom action buttons
+    this.addButton('guide_play', 360, 600, 320, 50, "O'YINNI BOSHLASH >>", () => {
+      this.game.startStage(1);
+    }, '#00ffcc');
+
+    this.addButton('guide_back', 700, 600, 240, 50, "ASOSIY MENYU", () => {
+      this.game.state = 'MENU';
+    }, '#00f0ff');
+    ctx.textAlign = 'left';
   }
 
   renderButtons(ctx) {
