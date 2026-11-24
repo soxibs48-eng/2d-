@@ -102,6 +102,9 @@ class UIManager {
       case 'CONTROLS_GUIDE':
         this.drawControlsGuide(ctx);
         break;
+      case 'BACKGROUND_SELECT':
+        this.drawBackgroundSelect(ctx);
+        break;
     }
 
     this.renderButtons(ctx);
@@ -384,27 +387,28 @@ class UIManager {
       this.game.jumpToHighestLevelPage();
       this.game.state = 'LEVEL_SELECT';
     }, '#00ffcc');
-    this.addButton('endless', 260, 380, 360, 48, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
-    this.addButton('shop', 260, 438, 360, 48, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
+    this.addButton('endless', 260, 378, 360, 48, "CHEKSIZ REJIM (ENDLESS)", () => this.game.startEndlessGame(), '#ffaa00');
+    this.addButton('shop', 260, 434, 360, 48, "DO'KON (5 TA SKIN)", () => { this.game.state = 'SHOP'; }, '#ffd700');
 
     // Right Column
     this.addButton('quests', 660, 315, 360, 54, "KUNLIK VAZIFALAR 🏆", () => { this.game.state = 'QUESTS'; }, '#00f0ff');
-    this.addButton('pets', 660, 380, 360, 48, "HAMROHLAR (PETS) 🤖", () => { this.game.state = 'PETS'; }, '#00ffaa');
-    this.addButton('settings', 660, 438, 360, 48, "SOZLAMALAR ⚙️", () => { this.game.state = 'SETTINGS'; }, '#00b0ff');
+    this.addButton('pets', 660, 378, 360, 48, "HAMROHLAR (PETS) 🤖", () => { this.game.state = 'PETS'; }, '#00ffaa');
+    this.addButton('settings', 660, 434, 360, 48, "SOZLAMALAR ⚙️", () => { this.game.state = 'SETTINGS'; }, '#00b0ff');
 
-    // CENTER PROMINENT HOW-TO-PLAY BUTTON
-    this.addButton('how_to_play', 410, 502, 460, 52, "QANDAY O'YNASH KERAK? 🕹️", () => {
+    // CENTER ACTION BUTTONS
+    this.addButton('how_to_play', 410, 492, 460, 46, "QANDAY O'YNASH KERAK? 🕹️", () => {
       this.game.state = 'CONTROLS_GUIDE';
-    }, '#ff00aa');
+    }, '#00ffcc');
+
+    this.addButton('bg_select', 410, 546, 460, 46, "FONNI ALMASHTIRISH (10 TA BIOM) 🎨", () => {
+      this.game.state = 'BACKGROUND_SELECT';
+    }, '#ffd700');
 
     ctx.fillStyle = 'rgba(0, 240, 255, 0.75)';
-    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.font = '11px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText("Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE] / [ENTER]", 640, 585);
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-    ctx.font = '14px "Rajdhani", sans-serif';
-    ctx.fillText("O'yinda sakrash uchun: [SPACE], [W], [↑] yoki ekranni bosing! Yotish uchun: [S]", 640, 615);
+    ctx.fillText("Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE] / [ENTER]", 640, 615);
+    ctx.textAlign = 'left';
     ctx.textAlign = 'left';
   }
 
@@ -764,24 +768,30 @@ class UIManager {
     ctx.fillRect(0, 0, 1280, 720);
 
     ctx.fillStyle = '#0f172a';
-    ctx.fillRect(480, 150, 320, 420);
+    ctx.fillRect(480, 130, 320, 460);
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2;
-    ctx.strokeRect(480, 150, 320, 420);
+    ctx.strokeRect(480, 130, 320, 460);
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = '24px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('PAUZA', 640, 210);
+    ctx.fillText('PAUZA', 640, 185);
     ctx.textAlign = 'left';
 
-    this.addButton('resume', 510, 240, 260, 46, 'DAVOM ETTIRISH', () => this.game.resumeGame(), '#00ffcc');
-    this.addButton('pause_quests', 510, 300, 260, 46, 'KUNLIK VAZIFALAR', () => { this.game.state = 'QUESTS'; }, '#00f0ff');
-    this.addButton('restart', 510, 360, 260, 46, 'QAYTA BOSHLASH', () => {
+    const curBg = (this.game.bgSys && this.game.bgSys.getActiveTheme()) ? this.game.bgSys.getActiveTheme().name.split(' ')[0] : 'AUTO';
+
+    this.addButton('resume', 510, 215, 260, 44, 'DAVOM ETTIRISH', () => this.game.resumeGame(), '#00ffcc');
+    this.addButton('pause_quests', 510, 270, 260, 44, 'KUNLIK VAZIFALAR', () => { this.game.state = 'QUESTS'; }, '#00f0ff');
+    this.addButton('pause_bg', 510, 325, 260, 44, `🎨 FON: ${curBg}`, () => {
+      this.game.bgSys.cycleTheme();
+      AudioSys.playSFX('powerup');
+    }, '#ffd700');
+    this.addButton('restart', 510, 380, 260, 44, 'QAYTA BOSHLASH', () => {
       if (this.game.gameMode === 'campaign') this.game.startStage(this.game.currentStage);
       else this.game.startEndlessGame();
-    }, '#ffd700');
-    this.addButton('menu', 510, 420, 260, 46, 'ASOSIY MENYU', () => { this.game.state = 'MENU'; }, '#ff4444');
+    }, '#ffaa00');
+    this.addButton('menu', 510, 435, 260, 44, 'ASOSIY MENYU', () => { this.game.state = 'MENU'; }, '#ff4444');
   }
 
   drawGameOver(ctx) {
@@ -971,7 +981,7 @@ class UIManager {
       AudioSys.setSFXVolume(v);
     });
 
-    this.addButton('fullscreen', 480, 420, 320, 40, 'TO\'LIQ EKRAN', () => {
+    this.addButton('fullscreen', 480, 420, 320, 36, 'TO\'LIQ EKRAN', () => {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
       } else {
@@ -979,7 +989,11 @@ class UIManager {
       }
     }, '#00ffcc');
 
-    this.addButton('settings_back', 520, 490, 240, 44, 'ORTGA', () => { this.game.state = 'MENU'; }, '#00f0ff');
+    this.addButton('set_bg', 480, 466, 320, 36, 'FONNI TANLASH 🎨', () => {
+      this.game.state = 'BACKGROUND_SELECT';
+    }, '#ffd700');
+
+    this.addButton('settings_back', 520, 514, 240, 40, 'ORTGA', () => { this.game.state = 'MENU'; }, '#00f0ff');
   }
 
   drawControlsGuide(ctx) {
@@ -1103,6 +1117,97 @@ class UIManager {
     this.addButton('guide_back', 700, 600, 240, 50, "ASOSIY MENYU", () => {
       this.game.state = 'MENU';
     }, '#00f0ff');
+    ctx.textAlign = 'left';
+  }
+
+  drawBackgroundSelect(ctx) {
+    ctx.fillStyle = 'rgba(8, 10, 20, 0.96)';
+    ctx.fillRect(0, 0, 1280, 720);
+
+    // Frame
+    ctx.fillStyle = 'rgba(12, 18, 35, 0.95)';
+    ctx.fillRect(70, 30, 1140, 660);
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(70, 30, 1140, 660);
+
+    // Header
+    ctx.fillStyle = '#00f0ff';
+    ctx.font = '22px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 14;
+    ctx.fillText("🎨 FON VA MUHITLARNI TANLASH", 640, 72);
+    ctx.shadowBlur = 0;
+
+    const bgSys = this.game.bgSys;
+    const activeTheme = bgSys ? bgSys.getActiveTheme() : { name: 'AUTO' };
+    const currentSelectedId = bgSys ? bgSys.getSelectedThemeId() : 'auto';
+
+    ctx.fillStyle = '#ffd700';
+    ctx.font = '11px "Press Start 2P", monospace';
+    ctx.fillText(`FAOL REJIM: ${currentSelectedId === 'auto' ? 'AVTOMATIK (BOSQICHLI)' : activeTheme.name}  |  JAMI 10 TA BIOM`, 640, 100);
+
+    // Themes Grid (4 columns x 3 rows)
+    const themes = bgSys ? bgSys.getThemeList() : [];
+    const colW = 260;
+    const rowH = 118;
+    const startX = 96;
+    const startY = 125;
+
+    themes.forEach((t, idx) => {
+      const col = idx % 4;
+      const row = Math.floor(idx / 4);
+      const cardX = startX + col * (colW + 16);
+      const cardY = startY + row * (rowH + 14);
+      const isSelected = currentSelectedId === t.id;
+
+      ctx.fillStyle = isSelected ? 'rgba(15, 35, 30, 0.95)' : 'rgba(15, 23, 42, 0.9)';
+      ctx.fillRect(cardX, cardY, colW, rowH);
+      ctx.strokeStyle = isSelected ? '#00ffaa' : (t.color || '#00f0ff');
+      ctx.lineWidth = isSelected ? 3 : 1.5;
+      ctx.strokeRect(cardX, cardY, colW, rowH);
+
+      // Title & Icon
+      ctx.fillStyle = t.color || '#00f0ff';
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${t.icon || '🌌'} ${t.name.split('(')[0].trim()}`, cardX + 12, cardY + 24);
+
+      // Color accent preview bar
+      ctx.fillStyle = t.color || '#00f0ff';
+      ctx.fillRect(cardX + 12, cardY + 34, colW - 24, 4);
+
+      // Description
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '12px "Rajdhani", sans-serif';
+      const shortDesc = t.desc.length > 38 ? t.desc.substring(0, 36) + '...' : t.desc;
+      ctx.fillText(shortDesc, cardX + 12, cardY + 56);
+
+      // Selection Button
+      if (isSelected) {
+        ctx.fillStyle = '#00ffaa';
+        ctx.font = '11px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText("✓ TANLANGAN", cardX + colW / 2, cardY + 95);
+        ctx.textAlign = 'left';
+      } else {
+        this.addButton(`bg_btn_${t.id}`, cardX + 16, cardY + 74, colW - 32, 34, "TANLASH", () => {
+          if (bgSys) bgSys.setTheme(t.id);
+          AudioSys.playSFX('powerup');
+        }, t.color || '#00f0ff');
+      }
+    });
+
+    // Bottom Action Buttons
+    this.addButton('bg_play', 400, 630, 240, 44, "O'YINGA O'TISH >>", () => {
+      this.game.startStage(1);
+    }, '#00ffcc');
+
+    this.addButton('bg_back', 660, 630, 220, 44, "ASOSIY MENYU", () => {
+      this.game.state = 'MENU';
+    }, '#00f0ff');
+
     ctx.textAlign = 'left';
   }
 

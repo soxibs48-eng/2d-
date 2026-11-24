@@ -31,6 +31,7 @@ class Game {
     // Core Entities and Systems (v3.0)
     this.player = new Player(this);
     this.weatherSys = new WeatherSystem(this);
+    this.bgSys = new BackgroundSystem(this);
     this.companionPet = new CompanionPet(this);
     this.dailyQuests = new DailyQuestSystem(this);
     this.comboSys = new ComboSystem(this);
@@ -187,7 +188,7 @@ class Game {
           this.pauseGame();
         } else if (this.state === 'PAUSED') {
           this.resumeGame();
-        } else if (['LEVEL_SELECT', 'SHOP', 'PETS', 'QUESTS', 'SETTINGS', 'CONTROLS_GUIDE'].includes(this.state)) {
+        } else if (['LEVEL_SELECT', 'SHOP', 'PETS', 'QUESTS', 'SETTINGS', 'CONTROLS_GUIDE', 'BACKGROUND_SELECT'].includes(this.state)) {
           this.state = 'MENU';
         }
       }
@@ -675,57 +676,7 @@ class Game {
   }
 
   drawParallax() {
-    const { ctx } = this;
-
-    ctx.save();
-    if (this.currentStage === 3 || this.distance > 1200) {
-      ctx.filter = 'hue-rotate(90deg) saturate(1.25)';
-    } else if (this.currentStage === 2 || this.distance > 500) {
-      ctx.filter = 'hue-rotate(280deg) saturate(1.35)';
-    }
-
-    if (this.bgImages.sky.complete && this.bgImages.sky.naturalWidth > 0) {
-      const offX = -this.bgOffsets.sky;
-      ctx.drawImage(this.bgImages.sky, offX, 0, 1280, 720);
-      ctx.drawImage(this.bgImages.sky, offX + 1280, 0, 1280, 720);
-    } else {
-      ctx.fillStyle = '#0a0d1a';
-      ctx.fillRect(0, 0, 1280, 720);
-    }
-
-    if (this.bgImages.far.complete && this.bgImages.far.naturalWidth > 0) {
-      const offX = -this.bgOffsets.far;
-      ctx.drawImage(this.bgImages.far, offX, 0, 1280, 720);
-      ctx.drawImage(this.bgImages.far, offX + 1280, 0, 1280, 720);
-    }
-
-    if (this.bgImages.mid.complete && this.bgImages.mid.naturalWidth > 0) {
-      const offX = -this.bgOffsets.mid;
-      ctx.drawImage(this.bgImages.mid, offX, 0, 1280, 720);
-      ctx.drawImage(this.bgImages.mid, offX + 1280, 0, 1280, 720);
-    }
-
-    ctx.restore();
-
-    const ceilOffX = -this.bgOffsets.ceiling;
-    for (let x = ceilOffX - 256; x < 1280 + 256; x += 256) {
-      if (this.bgImages.ceiling.complete && this.bgImages.ceiling.naturalWidth > 0) {
-        ctx.drawImage(this.bgImages.ceiling, x, 76, 256, 64);
-      } else {
-        ctx.fillStyle = '#221533';
-        ctx.fillRect(x, 76, 256, 64);
-      }
-    }
-
-    const floorOffX = -this.bgOffsets.floor;
-    for (let x = floorOffX - 256; x < 1280 + 256; x += 256) {
-      if (this.bgImages.floor.complete && this.bgImages.floor.naturalWidth > 0) {
-        ctx.drawImage(this.bgImages.floor, x, 580, 256, 64);
-      } else {
-        ctx.fillStyle = '#162233';
-        ctx.fillRect(x, 580, 256, 64);
-      }
-    }
+    this.bgSys.drawParallax(this.ctx, this.bgOffsets);
   }
 
   loop(timestamp) {

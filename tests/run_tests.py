@@ -87,6 +87,7 @@ web_scripts = [
     "js/audio.js",
     "js/storage.js",
     "js/stages.js",
+    "js/background.js",
     "js/particles.js",
     "js/weather.js",
     "js/pet.js",

@@ -153,5 +153,14 @@ const StorageManager = {
     localStorage.setItem('pixel_runner_vol_master', master.toString());
     localStorage.setItem('pixel_runner_vol_music', music.toString());
     localStorage.setItem('pixel_runner_vol_sfx', sfx.toString());
+  },
+
+  // BACKGROUND THEMES
+  getBackgroundTheme() {
+    return localStorage.getItem('pixel_runner_bg_theme') || 'auto';
+  },
+
+  setBackgroundTheme(themeId) {
+    localStorage.setItem('pixel_runner_bg_theme', themeId);
   }
 };

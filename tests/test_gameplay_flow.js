@@ -57,6 +57,34 @@ const context = {
       }
       return { style: {}, addEventListener: () => {} };
     },
+    createElement(tag) {
+      return {
+        width: 1280,
+        height: 720,
+        getContext: () => ({
+          clearRect: () => {},
+          save: () => {},
+          restore: () => {},
+          translate: () => {},
+          rotate: () => {},
+          scale: () => {},
+          fillRect: () => {},
+          strokeRect: () => {},
+          beginPath: () => {},
+          closePath: () => {},
+          moveTo: () => {},
+          lineTo: () => {},
+          arc: () => {},
+          ellipse: () => {},
+          fill: () => {},
+          stroke: () => {},
+          fillText: () => {},
+          drawImage: () => {},
+          createLinearGradient: () => ({ addColorStop: () => {} }),
+          createRadialGradient: () => ({ addColorStop: () => {} })
+        })
+      };
+    },
     documentElement: { requestFullscreen: async () => {} }
   },
   Image: class {
@@ -78,6 +106,7 @@ const scriptFiles = [
   'js/audio.js',
   'js/storage.js',
   'js/stages.js',
+  'js/background.js',
   'js/particles.js',
   'js/weather.js',
   'js/pet.js',

@@ -23,16 +23,29 @@
   <div id="game-container">
     <canvas id="gameCanvas" width="1280" height="720"></canvas>
 
-    <!-- TOUCH & MOUSE ON-SCREEN CONTROLS -->
+    <!-- COMPACT MOBILE & TOUCH CONTROLS -->
     <div id="touch-controls">
       <div id="touch-left">
-        <button id="touch-dash" class="touch-btn">⚡ DASH [E]</button>
-        <button id="touch-flip" class="touch-btn">🔄 FLIP [F]</button>
+        <button id="touch-dash" class="touch-btn touch-circle" title="Dash (E)">
+          <span class="touch-icon">⚡</span>
+          <span class="touch-label">DASH</span>
+        </button>
+        <button id="touch-flip" class="touch-btn touch-circle" title="Flip Gravity (F)">
+          <span class="touch-icon">🔄</span>
+          <span class="touch-label">FLIP</span>
+        </button>
       </div>
 
       <div id="touch-right">
-        <button id="touch-jump" class="touch-btn">⬆️ SAKRASH (JUMP) [SPACE]</button>
-        <button id="touch-slide" class="touch-btn">⬇️ YOTISH (SLIDE) [S]</button>
+        <button id="touch-slide" class="touch-btn touch-circle" title="Slide (S)">
+          <span class="touch-icon">▼</span>
+          <span class="touch-label">SLIDE</span>
+        </button>
+        <button id="touch-jump" class="touch-btn touch-circle touch-jump-btn" title="Jump (Space)">
+          <span class="touch-icon">▲</span>
+          <span class="touch-label">JUMP</span>
+          <span class="touch-sub">2X</span>
+        </button>
       </div>
     </div>
   </div>
@@ -41,6 +54,7 @@
   <script src="js/audio.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/stages.js"></script>
+  <script src="js/background.js"></script>
   <script src="js/particles.js"></script>
   <script src="js/weather.js"></script>
   <script src="js/pet.js"></script>
