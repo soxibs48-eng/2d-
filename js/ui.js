@@ -336,12 +336,15 @@ class UIManager {
       ctx.strokeStyle = p.col;
       ctx.lineWidth = 1.5;
       ctx.strokeRect(p.x, p.y, p.w, p.h);
+      this.drawCyberCorners(ctx, p.x, p.y, p.w, p.h, p.col, 4);
 
       ctx.fillStyle = p.col;
       ctx.font = '10px "Press Start 2P", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(p.t, p.x + p.w / 2, p.y + 22);
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.t, p.x + p.w / 2, p.y + p.h / 2);
     });
+    ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'left';
   }
 
@@ -351,13 +354,16 @@ class UIManager {
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.strokeRect(x, y, 125, 36);
+    this.drawCyberCorners(ctx, x, y, 125, 36, color, 4);
 
     if (icon.complete) {
       ctx.drawImage(icon, x + 8, y + 6, 24, 24);
     }
     ctx.fillStyle = color;
-    ctx.font = '12px "Press Start 2P", monospace';
-    ctx.fillText(label, x + 38, y + 23);
+    ctx.font = '11px "Press Start 2P", monospace';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, x + 38, y + 18);
+    ctx.textBaseline = 'alphabetic';
   }
 
   drawMainMenu(ctx) {
@@ -369,16 +375,16 @@ class UIManager {
     ctx.textAlign = 'center';
     ctx.shadowColor = '#00f0ff';
     ctx.shadowBlur = 24;
-    ctx.fillText('PIXEL RUNNER', 640, 160);
+    ctx.fillText('PIXEL RUNNER', 640, 155);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ff2288';
     ctx.font = '16px "Press Start 2P", monospace';
-    ctx.fillText('— ANTI-GRAVITY PROTOCOL (v3.0) —', 640, 210);
+    ctx.fillText('— ANTI-GRAVITY PROTOCOL (v3.0) —', 640, 205);
 
-    ctx.fillStyle = '#8899aa';
+    ctx.fillStyle = '#94a3b8';
     ctx.font = '12px "Press Start 2P", monospace';
-    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M  |  TANGALAR: ${StorageManager.getTotalCoins()}`, 640, 255);
+    ctx.fillText(`ENG YUQORI REKORD: ${Math.floor(StorageManager.getHighScore())} M   |   TANGALAR: ${StorageManager.getTotalCoins()} 🪙`, 640, 252);
     ctx.textAlign = 'left';
 
     // 2-COLUMN BUTTON LAYOUT FOR BALANCED DESIGN
@@ -404,11 +410,10 @@ class UIManager {
       this.game.state = 'BACKGROUND_SELECT';
     }, '#ffd700');
 
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.75)';
-    ctx.font = '11px "Press Start 2P", monospace';
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.85)';
+    ctx.font = 'bold 15px "Rajdhani", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText("Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE] / [ENTER]", 640, 615);
-    ctx.textAlign = 'left';
+    ctx.fillText("💡 Boshlash: [BOSQICHLI REJIM] tugmasi yoki klaviaturada [SPACE] / [ENTER]", 640, 616);
     ctx.textAlign = 'left';
   }
 
@@ -440,10 +445,13 @@ class UIManager {
     ctx.strokeStyle = sector.color;
     ctx.lineWidth = 2;
     ctx.strokeRect(260, navY, 760, 42);
+    this.drawCyberCorners(ctx, 260, navY, 760, 42, sector.color, 6);
 
     ctx.fillStyle = sector.color;
     ctx.font = '12px "Press Start 2P", monospace';
-    ctx.fillText(`SEKTOR ${page}/10: ${sector.name} (${(page - 1) * 10 + 1}-${page * 10}-BOSQICH)`, 640, navY + 26);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`SEKTOR ${page}/10: ${sector.name} (${(page - 1) * 10 + 1}-${page * 10}-BOSQICH)`, 640, navY + 21);
+    ctx.textBaseline = 'alphabetic';
     ctx.textAlign = 'left';
 
     // Sector Prev / Next Buttons
@@ -477,6 +485,7 @@ class UIManager {
       ctx.strokeStyle = isUnlocked ? (st.isBoss ? '#ff0055' : st.color) : '#334155';
       ctx.lineWidth = isUnlocked ? (st.isBoss ? 3 : 2) : 1;
       ctx.strokeRect(cardX, cardY, cardW, cardH);
+      this.drawCyberCorners(ctx, cardX, cardY, cardW, cardH, isUnlocked ? (st.isBoss ? '#ff0055' : st.color) : '#334155', 6);
 
       // Card Header
       ctx.textAlign = 'center';
@@ -490,9 +499,9 @@ class UIManager {
       ctx.fillText(st.name, cardX + cardW / 2, cardY + 50);
 
       // Target Distance
-      ctx.fillStyle = '#88aacc';
-      ctx.font = '11px "Press Start 2P", monospace';
-      ctx.fillText(st.isBoss ? `BOSS JANGI` : `${st.targetDistance} metr`, cardX + cardW / 2, cardY + 76);
+      ctx.fillStyle = isUnlocked ? '#88aacc' : '#475569';
+      ctx.font = 'bold 15px "Rajdhani", sans-serif';
+      ctx.fillText(st.isBoss ? `BOSS JANGI` : `${st.targetDistance} METR`, cardX + cardW / 2, cardY + 76);
 
       // Stars
       const starsEarned = starsData[st.num] || 0;
@@ -538,11 +547,11 @@ class UIManager {
     // Bottom Navigation Hint
     ctx.textAlign = 'center';
     ctx.fillStyle = '#00ffcc';
-    ctx.font = '12px "Rajdhani", sans-serif';
-    ctx.fillText("💡 QAYERNI BOSISH KERAK: O'yinda [SPACE], [W] yoki Ekranni bosib sakraysiz (2x/3x)! Pastdagi [S] bilan yotasiz.", 640, 662);
-    ctx.fillStyle = 'rgba(0, 240, 255, 0.55)';
-    ctx.font = '11px "Rajdhani", sans-serif';
-    ctx.fillText("Klaviaturada: ← / → sahifa almashtirish  |  [SPACE] / [ENTER]: Boshlash  |  ESC: Menyuga qaytish", 640, 682);
+    ctx.font = 'bold 15px "Rajdhani", sans-serif';
+    ctx.fillText("💡 QAYERNI BOSISH KERAK: O'yinda [SPACE], [W] yoki Ekranni bosib sakraysiz (2x/3x)! Pastdagi [S] bilan yotasiz.", 640, 660);
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.65)';
+    ctx.font = 'bold 13px "Rajdhani", sans-serif';
+    ctx.fillText("Klaviaturada: ← / → sahifa almashtirish  |  [SPACE] / [ENTER]: Boshlash  |  ESC: Menyuga qaytish", 640, 680);
     ctx.textAlign = 'left';
   }
 
@@ -553,7 +562,10 @@ class UIManager {
     ctx.fillStyle = '#00f0ff';
     ctx.font = '28px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 18;
     ctx.fillText("KUNLIK VAZIFALAR (DAILY QUESTS)", 640, 75);
+    ctx.shadowBlur = 0;
 
     const qSys = this.game.dailyQuests;
     ctx.fillStyle = '#8899aa';
@@ -572,6 +584,7 @@ class UIManager {
       ctx.strokeStyle = q.completed ? '#00ffaa' : '#00b0ff';
       ctx.lineWidth = 2;
       ctx.strokeRect(cardX, cardY, cardW, cardH);
+      this.drawCyberCorners(ctx, cardX, cardY, cardW, cardH, q.completed ? '#00ffaa' : '#00b0ff', 6);
 
       // Quest Title & Desc
       ctx.textAlign = 'left';
@@ -580,7 +593,7 @@ class UIManager {
       ctx.fillText(q.title, cardX + 25, cardY + 34);
 
       ctx.fillStyle = '#88aacc';
-      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.font = 'bold 15px "Rajdhani", sans-serif';
       ctx.fillText(q.desc, cardX + 25, cardY + 60);
 
       // Progress Bar
@@ -633,7 +646,10 @@ class UIManager {
     ctx.fillStyle = '#00ffaa';
     ctx.font = '28px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#00ffaa';
+    ctx.shadowBlur = 18;
     ctx.fillText("HAMROH JONZOTLAR (PET DRONES)", 640, 75);
+    ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ffd700';
     ctx.font = '15px "Press Start 2P", monospace';
@@ -663,6 +679,7 @@ class UIManager {
       ctx.strokeStyle = isEquipped ? '#00ffaa' : p.color;
       ctx.lineWidth = isEquipped ? 3 : 2;
       ctx.strokeRect(cardX, cardY, cardW, cardH);
+      this.drawCyberCorners(ctx, cardX, cardY, cardW, cardH, isEquipped ? '#00ffaa' : p.color, 8);
 
       // Pet Title
       ctx.fillStyle = p.color;
@@ -672,7 +689,7 @@ class UIManager {
 
       // Description
       ctx.fillStyle = '#88aacc';
-      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.font = 'bold 15px "Rajdhani", sans-serif';
       ctx.fillText(p.desc, cardX + cardW / 2, cardY + 120);
 
       // Price
@@ -717,6 +734,7 @@ class UIManager {
     ctx.strokeStyle = '#00ffcc';
     ctx.lineWidth = 3;
     ctx.strokeRect(380, 100, 520, 520);
+    this.drawCyberCorners(ctx, 380, 100, 520, 520, '#00ffcc', 10);
 
     const stData = StageDatabase.getStage(this.game.currentStage);
     const nextStData = this.game.currentStage < 100 ? StageDatabase.getStage(this.game.currentStage + 1) : null;
@@ -724,7 +742,10 @@ class UIManager {
     ctx.fillStyle = '#00ffcc';
     ctx.font = '26px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#00ffcc';
+    ctx.shadowBlur = 18;
     ctx.fillText(`${this.game.currentStage}-BOSQICH YAKUNLANDI!`, 640, 160);
+    ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ffd700';
     ctx.font = '24px "Press Start 2P", monospace';
@@ -745,7 +766,7 @@ class UIManager {
 
     if (this.game.currentStage < 100) {
       ctx.fillStyle = '#88aacc';
-      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.font = 'bold 16px "Rajdhani", sans-serif';
       ctx.fillText(`Keyingi bosqich masofasi: ${nextStData.targetDistance}m (yana ${nextStData.targetDistance - stData.targetDistance}m uzunroq!)`, 640, 395);
 
       this.addButton('stage_next', 410, 425, 460, 50, `KEYINGI (${this.game.currentStage + 1}-BOSQICH: ${nextStData.targetDistance}M) >>`, () => {
@@ -772,11 +793,15 @@ class UIManager {
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2;
     ctx.strokeRect(480, 130, 320, 460);
+    this.drawCyberCorners(ctx, 480, 130, 320, 460, '#00f0ff', 8);
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = '24px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 16;
     ctx.fillText('PAUZA', 640, 185);
+    ctx.shadowBlur = 0;
     ctx.textAlign = 'left';
 
     const curBg = (this.game.bgSys && this.game.bgSys.getActiveTheme()) ? this.game.bgSys.getActiveTheme().name.split(' ')[0] : 'AUTO';
@@ -803,11 +828,15 @@ class UIManager {
     ctx.strokeStyle = '#ff2255';
     ctx.lineWidth = 2;
     ctx.strokeRect(430, 120, 420, 480);
+    this.drawCyberCorners(ctx, 430, 120, 420, 480, '#ff2255', 8);
 
     ctx.fillStyle = '#ff2255';
     ctx.font = '28px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#ff2255';
+    ctx.shadowBlur = 20;
     ctx.fillText("O'YIN TUGADI!", 640, 180);
+    ctx.shadowBlur = 0;
 
     if (this.game.isNewRecord) {
       ctx.fillStyle = '#ffd700';
@@ -816,7 +845,7 @@ class UIManager {
     }
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '14px "Press Start 2P", monospace';
+    ctx.font = '13px "Press Start 2P", monospace';
     ctx.fillText(`Masofa: ${Math.floor(this.game.distance)} m`, 640, 260);
     ctx.fillStyle = '#ffd700';
     ctx.fillText(`Tangalar: +${this.game.coins}`, 640, 295);
@@ -841,7 +870,10 @@ class UIManager {
     ctx.fillStyle = '#00f0ff';
     ctx.font = '28px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 18;
     ctx.fillText("MAGAZIN — QAHRAMON SKINLARI", 640, 65);
+    ctx.shadowBlur = 0;
 
     ctx.fillStyle = '#ffd700';
     ctx.font = '16px "Press Start 2P", monospace';
@@ -872,6 +904,7 @@ class UIManager {
       ctx.strokeStyle = isEquipped ? '#00ffcc' : s.color;
       ctx.lineWidth = isEquipped ? 3 : 2;
       ctx.strokeRect(cardX, cardY, cardW, cardH);
+      this.drawCyberCorners(ctx, cardX, cardY, cardW, cardH, isEquipped ? '#00ffcc' : s.color, 6);
 
       ctx.fillStyle = s.color;
       ctx.font = '11px "Press Start 2P", monospace';
@@ -879,7 +912,7 @@ class UIManager {
       ctx.fillText(s.name, cardX + cardW / 2, cardY + 36);
 
       ctx.fillStyle = '#88aacc';
-      ctx.font = '13px "Rajdhani", sans-serif';
+      ctx.font = 'bold 14px "Rajdhani", sans-serif';
       ctx.fillText(s.desc, cardX + cardW / 2, cardY + 70);
 
       const previewImg = new Image();
@@ -932,11 +965,15 @@ class UIManager {
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2;
     ctx.strokeRect(440, 130, 400, 460);
+    this.drawCyberCorners(ctx, 440, 130, 400, 460, '#00f0ff', 8);
 
     ctx.fillStyle = '#00f0ff';
     ctx.font = '24px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 16;
     ctx.fillText('SOZLAMALAR', 640, 190);
+    ctx.shadowBlur = 0;
     ctx.textAlign = 'left';
 
     const master = Math.round(StorageManager.getMasterVolume() * 100);
@@ -1011,6 +1048,7 @@ class UIManager {
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2.5;
     ctx.strokeRect(mx, my, mw, mh);
+    this.drawCyberCorners(ctx, mx, my, mw, mh, '#00f0ff', 10);
 
     // Header
     ctx.fillStyle = '#00f0ff';
@@ -1083,6 +1121,7 @@ class UIManager {
       ctx.strokeStyle = c.color;
       ctx.lineWidth = 2;
       ctx.strokeRect(c.x, c.y, c.w, c.h);
+      this.drawCyberCorners(ctx, c.x, c.y, c.w, c.h, c.color, 6);
 
       // Card Title
       ctx.fillStyle = c.color;
@@ -1102,7 +1141,7 @@ class UIManager {
       ctx.fillText(c.keys, c.x + 30, c.y + 62);
 
       // Bullet points
-      ctx.font = '14px "Rajdhani", sans-serif';
+      ctx.font = 'bold 15px "Rajdhani", sans-serif';
       ctx.fillStyle = '#cbd5e1';
       c.desc.forEach((line, lidx) => {
         ctx.fillText(line, c.x + 20, c.y + 96 + lidx * 24);
@@ -1130,6 +1169,7 @@ class UIManager {
     ctx.strokeStyle = '#00f0ff';
     ctx.lineWidth = 2.5;
     ctx.strokeRect(70, 30, 1140, 660);
+    this.drawCyberCorners(ctx, 70, 30, 1140, 660, '#00f0ff', 10);
 
     // Header
     ctx.fillStyle = '#00f0ff';
@@ -1167,6 +1207,7 @@ class UIManager {
       ctx.strokeStyle = isSelected ? '#00ffaa' : (t.color || '#00f0ff');
       ctx.lineWidth = isSelected ? 3 : 1.5;
       ctx.strokeRect(cardX, cardY, colW, rowH);
+      this.drawCyberCorners(ctx, cardX, cardY, colW, rowH, isSelected ? '#00ffaa' : (t.color || '#00f0ff'), 5);
 
       // Title & Icon
       ctx.fillStyle = t.color || '#00f0ff';
@@ -1180,7 +1221,7 @@ class UIManager {
 
       // Description
       ctx.fillStyle = '#94a3b8';
-      ctx.font = '12px "Rajdhani", sans-serif';
+      ctx.font = 'bold 13px "Rajdhani", sans-serif';
       const shortDesc = t.desc.length > 38 ? t.desc.substring(0, 36) + '...' : t.desc;
       ctx.fillText(shortDesc, cardX + 12, cardY + 56);
 
@@ -1211,23 +1252,81 @@ class UIManager {
     ctx.textAlign = 'left';
   }
 
+  drawCyberCorners(ctx, x, y, w, h, color, size = 6) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    // Top-Left
+    ctx.moveTo(x, y + size); ctx.lineTo(x, y); ctx.lineTo(x + size, y);
+    // Top-Right
+    ctx.moveTo(x + w - size, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + size);
+    // Bottom-Left
+    ctx.moveTo(x, y + h - size); ctx.lineTo(x, y + h); ctx.lineTo(x + size, y + h);
+    // Bottom-Right
+    ctx.moveTo(x + w - size, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - size);
+    ctx.stroke();
+  }
+
+  getButtonFont(text, width) {
+    if (!text) return '11px "Press Start 2P", monospace';
+    const clean = text.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, 'XX');
+    const len = clean.length;
+    if (len <= 14 && width >= 140) {
+      return '11px "Press Start 2P", monospace';
+    } else if (len <= 20 && width >= 180) {
+      return '10px "Press Start 2P", monospace';
+    } else if (len <= 26 && width >= 250) {
+      return '9px "Press Start 2P", monospace';
+    } else {
+      const size = width < 260 ? 14 : 16;
+      return `bold ${size}px "Rajdhani", sans-serif`;
+    }
+  }
+
   renderButtons(ctx) {
     for (const btn of this.buttons) {
       if (btn.color === 'transparent') continue;
 
       const isHover = this.hoveredBtn === btn;
-      ctx.fillStyle = isHover ? 'rgba(0, 240, 255, 0.28)' : 'rgba(15, 23, 42, 0.9)';
-      ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+      const x = btn.x;
+      const y = btn.y;
+      const w = btn.width;
+      const h = btn.height;
 
+      // Dark glassmorphic button background gradient
+      const grad = ctx.createLinearGradient(x, y, x, y + h);
+      if (isHover) {
+        grad.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
+        grad.addColorStop(1, 'rgba(0, 160, 220, 0.22)');
+      } else {
+        grad.addColorStop(0, 'rgba(18, 26, 48, 0.94)');
+        grad.addColorStop(1, 'rgba(10, 16, 30, 0.96)');
+      }
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, w, h);
+
+      // Border with neon accent
       ctx.strokeStyle = isHover ? '#ffffff' : btn.color;
-      ctx.lineWidth = isHover ? 3 : 2;
-      ctx.strokeRect(btn.x, btn.y, btn.width, btn.height);
+      ctx.lineWidth = isHover ? 2.5 : 1.5;
+      ctx.strokeRect(x, y, w, h);
 
+      // Futuristic cyber corner brackets
+      this.drawCyberCorners(ctx, x, y, w, h, isHover ? '#ffffff' : btn.color, 6);
+
+      // Button text with pixel-perfect vertical centering
+      ctx.save();
+      if (isHover) {
+        ctx.shadowColor = btn.color;
+        ctx.shadowBlur = 10;
+      }
       ctx.fillStyle = isHover ? '#ffffff' : btn.color;
-      ctx.font = '12px "Press Start 2P", monospace';
+      ctx.font = this.getButtonFont(btn.text, w);
       ctx.textAlign = 'center';
-      ctx.fillText(btn.text, btn.x + btn.width / 2, btn.y + btn.height / 2 + 5);
-      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(btn.text, x + w / 2, y + h / 2);
+      ctx.restore();
     }
+    ctx.textBaseline = 'alphabetic';
+    ctx.textAlign = 'left';
   }
 }

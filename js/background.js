@@ -417,34 +417,54 @@ class BackgroundSystem {
   generateFloorCanvas(theme) {
     const canvas = document.createElement('canvas');
     canvas.width = 256;
-    canvas.height = 64;
+    canvas.height = 140;
     const ctx = canvas.getContext('2d');
     if (!ctx) return canvas;
 
-    // Floor base
-    ctx.fillStyle = theme.surfaceTint || '#162233';
-    ctx.fillRect(0, 0, 256, 64);
+    // Floor base gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, 140);
+    grad.addColorStop(0, theme.surfaceTint || '#162233');
+    grad.addColorStop(1, '#050810');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 140);
 
-    // Glowing top edge
+    // Glowing laser beam edge (running surface at y=0)
     ctx.fillStyle = theme.gridColor || '#00f0ff';
     ctx.fillRect(0, 0, 256, 4);
 
+    // Edge gradient glow strip
+    const edgeGrad = ctx.createLinearGradient(0, 4, 0, 26);
+    edgeGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
+    edgeGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = edgeGrad;
+    ctx.fillRect(0, 4, 256, 22);
+
     // High-tech floor grid / circuitry
     ctx.strokeStyle = theme.gridColor || '#00f0ff';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.2;
     ctx.globalAlpha = 0.45;
     for (let x = 0; x < 256; x += 32) {
       ctx.beginPath();
       ctx.moveTo(x, 4);
-      ctx.lineTo(x + 16, 64);
+      ctx.lineTo(x + 20, 140);
       ctx.stroke();
     }
+    // Horizontal runway grid lines
     ctx.beginPath();
-    ctx.moveTo(0, 22);
-    ctx.lineTo(256, 22);
-    ctx.moveTo(0, 44);
-    ctx.lineTo(256, 44);
+    ctx.moveTo(0, 28);
+    ctx.lineTo(256, 28);
+    ctx.moveTo(0, 64);
+    ctx.lineTo(256, 64);
+    ctx.moveTo(0, 105);
+    ctx.lineTo(256, 105);
     ctx.stroke();
+
+    // Circuit nodes
+    ctx.fillStyle = theme.gridColor || '#00f0ff';
+    for (let x = 16; x < 256; x += 64) {
+      ctx.fillRect(x - 2, 26, 4, 4);
+      ctx.fillRect(x + 20, 62, 4, 4);
+    }
     ctx.globalAlpha = 1.0;
 
     return canvas;
@@ -453,27 +473,52 @@ class BackgroundSystem {
   generateCeilingCanvas(theme) {
     const canvas = document.createElement('canvas');
     canvas.width = 256;
-    canvas.height = 64;
+    canvas.height = 140;
     const ctx = canvas.getContext('2d');
     if (!ctx) return canvas;
 
-    // Ceiling base
-    ctx.fillStyle = theme.surfaceTint || '#162233';
-    ctx.fillRect(0, 0, 256, 64);
+    // Ceiling base gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, 140);
+    grad.addColorStop(0, '#050810');
+    grad.addColorStop(1, theme.surfaceTint || '#162233');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 140);
 
-    // Glowing bottom edge (where player walks when inverted)
+    // Glowing bottom edge (where inverted player walks at y=140)
     ctx.fillStyle = theme.gridColor || '#00f0ff';
-    ctx.fillRect(0, 60, 256, 4);
+    ctx.fillRect(0, 136, 256, 4);
+
+    // Glow strip upwards
+    const edgeGrad = ctx.createLinearGradient(0, 136, 0, 114);
+    edgeGrad.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
+    edgeGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = edgeGrad;
+    ctx.fillRect(0, 114, 256, 22);
 
     // Inverted ceiling grid lines
     ctx.strokeStyle = theme.gridColor || '#00f0ff';
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 1.2;
     ctx.globalAlpha = 0.45;
     for (let x = 0; x < 256; x += 32) {
       ctx.beginPath();
-      ctx.moveTo(x, 60);
-      ctx.lineTo(x + 16, 0);
+      ctx.moveTo(x, 136);
+      ctx.lineTo(x + 20, 0);
       ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.moveTo(0, 108);
+    ctx.lineTo(256, 108);
+    ctx.moveTo(0, 72);
+    ctx.lineTo(256, 72);
+    ctx.moveTo(0, 32);
+    ctx.lineTo(256, 32);
+    ctx.stroke();
+
+    // Circuit nodes
+    ctx.fillStyle = theme.gridColor || '#00f0ff';
+    for (let x = 16; x < 256; x += 64) {
+      ctx.fillRect(x - 2, 106, 4, 4);
+      ctx.fillRect(x + 20, 70, 4, 4);
     }
     ctx.globalAlpha = 1.0;
 
@@ -502,27 +547,26 @@ class BackgroundSystem {
       ctx.drawImage(cached.mid, midX, 0, 1280, 720);
       ctx.drawImage(cached.mid, midX + 1280, 0, 1280, 720);
 
-      ctx.restore();
-
-      // 4. CEILING (y: 76 to 140, 1.0x parallax)
+      // 4. CEILING (y: 0 to 140, 1.0x parallax)
       const ceilOffX = -(bgOffsets.ceiling % 256);
       for (let x = ceilOffX - 256; x < 1280 + 256; x += 256) {
-        ctx.drawImage(cached.ceiling, x, 76, 256, 64);
+        ctx.drawImage(cached.ceiling, x, 0, 256, 140);
       }
 
-      // 5. FLOOR (y: 580 to 644, 1.0x parallax)
+      // 5. FLOOR (y: 580 to 720, 1.0x parallax)
       const floorOffX = -(bgOffsets.floor % 256);
       for (let x = floorOffX - 256; x < 1280 + 256; x += 256) {
-        ctx.drawImage(cached.floor, x, 580, 256, 64);
+        ctx.drawImage(cached.floor, x, 580, 256, 140);
       }
     } else {
       // Fallback if headless / context unavailable
       ctx.fillStyle = theme.skyColors ? theme.skyColors[0] : '#080a1a';
       ctx.fillRect(0, 0, 1280, 720);
       ctx.fillStyle = theme.surfaceTint || '#162233';
-      ctx.fillRect(0, 76, 1280, 64);
-      ctx.fillRect(0, 580, 1280, 64);
-      ctx.restore();
+      ctx.fillRect(0, 0, 1280, 140);
+      ctx.fillRect(0, 580, 1280, 140);
     }
+
+    ctx.restore();
   }
 }
