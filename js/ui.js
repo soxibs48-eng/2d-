@@ -906,7 +906,7 @@ class UIManager {
       if (isEquipped) {
         btnText = 'JIHOZLANGAN';
         btnColor = '#00ffcc';
-        action = () => {};
+        action = () => { };
       } else if (isUnlocked) {
         btnText = 'TANLASH';
         btnColor = '#00f0ff';
@@ -983,9 +983,9 @@ class UIManager {
 
     this.addButton('fullscreen', 480, 420, 320, 36, 'TO\'LIQ EKRAN', () => {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
+        document.documentElement.requestFullscreen().catch(() => { });
       } else {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
       }
     }, '#00ffcc');
 
