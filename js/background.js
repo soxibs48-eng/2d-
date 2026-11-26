@@ -531,32 +531,45 @@ class BackgroundSystem {
 
     ctx.save();
 
+    // Dark solid backdrop to prevent ANY clear edge flicker during camera shake
+    ctx.fillStyle = theme.skyColors ? theme.skyColors[0] : '#080a1a';
+    ctx.fillRect(-60, -40, 1400, 800);
+
     if (cached) {
-      // 1. SKY LAYER (0.1x parallax)
-      const skyX = -(bgOffsets.sky % 1280);
-      ctx.drawImage(cached.sky, skyX, 0, 1280, 720);
-      ctx.drawImage(cached.sky, skyX + 1280, 0, 1280, 720);
-
-      // 2. FAR ARCHITECTURE LAYER (0.3x parallax)
-      const farX = -(bgOffsets.far % 1280);
-      ctx.drawImage(cached.far, farX, 0, 1280, 720);
-      ctx.drawImage(cached.far, farX + 1280, 0, 1280, 720);
-
-      // 3. MIDGROUND ARCHITECTURE LAYER (0.6x parallax)
-      const midX = -(bgOffsets.mid % 1280);
-      ctx.drawImage(cached.mid, midX, 0, 1280, 720);
-      ctx.drawImage(cached.mid, midX + 1280, 0, 1280, 720);
-
-      // 4. CEILING (y: 0 to 140, 1.0x parallax)
-      const ceilOffX = -(bgOffsets.ceiling % 256);
-      for (let x = ceilOffX - 256; x < 1280 + 256; x += 256) {
-        ctx.drawImage(cached.ceiling, x, 0, 256, 140);
+      // 1. SKY LAYER (0.1x parallax, integer alignment + 1px overlap to prevent subpixel seams)
+      const skyX = Math.floor(-(bgOffsets.sky % 1280));
+      ctx.drawImage(cached.sky, skyX, 0, 1281, 720);
+      ctx.drawImage(cached.sky, skyX + 1280, 0, 1281, 720);
+      if (skyX > -200) {
+        ctx.drawImage(cached.sky, skyX - 1280, 0, 1281, 720);
       }
 
-      // 5. FLOOR (y: 580 to 720, 1.0x parallax)
-      const floorOffX = -(bgOffsets.floor % 256);
+      // 2. FAR ARCHITECTURE LAYER (0.3x parallax)
+      const farX = Math.floor(-(bgOffsets.far % 1280));
+      ctx.drawImage(cached.far, farX, 0, 1281, 720);
+      ctx.drawImage(cached.far, farX + 1280, 0, 1281, 720);
+      if (farX > -200) {
+        ctx.drawImage(cached.far, farX - 1280, 0, 1281, 720);
+      }
+
+      // 3. MIDGROUND ARCHITECTURE LAYER (0.6x parallax)
+      const midX = Math.floor(-(bgOffsets.mid % 1280));
+      ctx.drawImage(cached.mid, midX, 0, 1281, 720);
+      ctx.drawImage(cached.mid, midX + 1280, 0, 1281, 720);
+      if (midX > -200) {
+        ctx.drawImage(cached.mid, midX - 1280, 0, 1281, 720);
+      }
+
+      // 4. CEILING (y: 0 to 140, 1.0x parallax, 1px overlap to prevent seam flicker)
+      const ceilOffX = Math.floor(-(bgOffsets.ceiling % 256));
+      for (let x = ceilOffX - 256; x < 1280 + 256; x += 256) {
+        ctx.drawImage(cached.ceiling, x, 0, 257, 140);
+      }
+
+      // 5. FLOOR (y: 580 to 720, 1.0x parallax, 1px overlap to prevent seam flicker)
+      const floorOffX = Math.floor(-(bgOffsets.floor % 256));
       for (let x = floorOffX - 256; x < 1280 + 256; x += 256) {
-        ctx.drawImage(cached.floor, x, 580, 256, 140);
+        ctx.drawImage(cached.floor, x, 580, 257, 140);
       }
     } else {
       // Fallback if headless / context unavailable

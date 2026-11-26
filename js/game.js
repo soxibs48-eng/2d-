@@ -6,6 +6,9 @@ class Game {
   constructor() {
     this.canvas = document.getElementById('gameCanvas');
     this.ctx = this.canvas.getContext('2d');
+    if (this.ctx) {
+      this.ctx.imageSmoothingEnabled = true;
+    }
 
     this.width = 1280;
     this.height = 720;

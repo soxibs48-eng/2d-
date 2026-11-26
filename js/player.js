@@ -165,7 +165,7 @@ class Player {
   flipGravity() {
     this.isInverted = !this.isInverted;
     AudioSys.playSFX('gravity_flip');
-    CameraSys.addTrauma(0.4);
+    CameraSys.addTrauma(0.08); // Silky smooth flip without screen shudder
     ParticleSys.addShockwave(this.x, this.y + this.height / 2, '#d844ff');
     ParticleSys.addFloatingText(this.x, this.y - 20, 'GRAVITY FLIP!', '#d844ff', 15);
     
@@ -186,7 +186,7 @@ class Player {
       this.dashCooldown = this.dashCooldownMax;
       
       AudioSys.playSFX('powerup');
-      CameraSys.addTrauma(0.35);
+      CameraSys.addTrauma(0.08); // Clean dash impulse without jarring screen jitter
       ParticleSys.addShockwave(this.x, this.y + this.height / 2, '#00ffff');
       ParticleSys.addFloatingText(this.x, this.y - 30, 'CYBER DASH!', '#00ffff', 16);
     }
